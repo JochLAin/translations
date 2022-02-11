@@ -1,20 +1,5 @@
-# @jochlain/translations
+const { default: create } = require('../lib');
 
-Translation module that support **Intl** format
-Can work with Symfony in Node or with Webpack (Encore)
-
-## Installation
-
-```shell
-npm install --save @jochlain/translations
-```
-
-## Usage
-
-<details>
-    <summary><b>Translations catalog example</b></summary>
-
-```javascript
 const CATALOG = {
     en: {
         messages: {
@@ -141,84 +126,77 @@ const CATALOG = {
         }
     },
 };
-```
-</details>
 
-```javascript
-import createIntlTranslator from "@jochlain/translations";
+test('Simplest translations', () => {
+    const translator = create(CATALOG);
 
-const translator = createIntlTranslator(CATALOG);
-console.log(translator.translate('hello')); // => "Hello"
+    expect(translator.translate('hello')).toBe(CATALOG.en.messages.hello);
+});
 
-console.log(translator.translate('hello', null, null, 'fr')); // => "Bonjour"
-console.log(translator.translate('hello', null, null, 'ar')); // => "hello"
+test('Simple translations with locale parameter', () => {
+    const translator = create(CATALOG);
 
-console.log(translator.translate('This field is required.', null, 'forms', 'fr')); // => "Ce champs est obligatoire."
-console.log(translator.translate('This field is required.', null, 'validators', 'fr')); // => "This field is required."
+    expect(translator.translate('hello', null, null, 'fr')).toBe(CATALOG.fr.messages.hello); // => "Hello"
+});
 
-const translatorTimesEn = translator.withDomain('times');
-const translatorTimesFr = translatorTimesEn.withLocale('fr');
+test('Simple translations with domain parameter', () => {
+    const translator = create(CATALOG);
 
-console.log(translatorTimesEn.translate('diff.ago.year', { count: 1 })); // => "1 year ago"
-console.log(translatorTimesEn.translate('diff.ago.year', { count: 2 })); // => "2 years ago"
-console.log(translatorTimesFr.translate('diff.ago.year', { count: 1 })); // => "il y a 1 an"
-console.log(translatorTimesFr.translate('diff.ago.year', { count: 2 })); // => "il y a 2 ans"
-```
+    expect(translator.translate('This field is required.', null, 'forms')).toBe(CATALOG.en.forms["This field is required."]); // => "This field is required."
+    expect(translator.translate('This field is required.', null, 'forms', 'fr')).toBe(CATALOG.fr.forms["This field is required."]); // => "Ce champs est obligatoire."
+});
 
-For more usage sample see [Jest test](https://github.com/JochLAin/translations/blob/main/test/index.test.js)
+test('Simple translations with unknown domain parameter', () => {
+    const translator = create(CATALOG);
 
-## Load translation file (front / back)
+    expect(translator.translate('hello', null, 'validators')).toBe('hello');
+});
 
-Due to security breach with dynamic require filename, module can't perform this for you.  
-But a webpack plugin can : [@jochlain/webpack-plugin-translations]()
+test('Simple translations with uninformed locale parameter', () => {
+    const translator = create(CATALOG);
 
-### Add loader for file extension
+    expect(translator.translate('hello', null, null, 'ar')).toBe('hello');
+});
 
-#### Add babel plugin to work in node
+test('Simple translations with default locale', () => {
+    const translator = create(CATALOG, 'fr');
 
-I'm working on babel plugin to load translation file directly in node
+    expect(translator.translate('hello')).toBe(CATALOG.fr.messages.hello); // => "Bonjour"
+    expect(translator.translate('hello', null, null, 'en')).toBe(CATALOG.en.messages.hello); // => "Hello"
+    expect(translator.translate('hello', null, null, 'it')).toBe(CATALOG.it.messages.hello); // => "Ciao"
+    expect(translator.translate('hello', null, null, 'ar')).toBe('hello');
+});
 
-- JSON is native
-- [@jochlain/babel-plugin-yaml](https://www.npmjs.com/package/@jochlain/babel-plugin-yaml)
-- ...
+test('Simple translation with helpers', () => {
+    const translator = create(CATALOG);
 
-#### Add wepback configuration to work with
+    expect(translator.translate('hello')).toBe(CATALOG.en.messages.hello); // => "Hello"
+    expect(translator.withLocale('fr').translate('hello')).toBe(CATALOG.fr.messages.hello); // => "Bonjour"
+    expect(translator.withDomain('forms').translate('This field is required.')).toBe(CATALOG.en.forms['This field is required.']); // => "This field is required."
+    expect(translator.with({ domain: 'forms', locale: 'fr' }).translate('This field is required.')).toBe(CATALOG.fr.forms['This field is required.']); // => "Ce champs est obligatoire."
+});
 
-[How to add loader to Webpack Encore](https://symfony.com/doc/current/frontend/encore/custom-loaders-plugins.html)
+test('Compound key translations', () => {
+    const translator = create(CATALOG);
 
-- [JSON loader](https://v4.webpack.js.org/loaders/json-loader/)
-- [YAML loader](https://www.npmjs.com/package/yaml-loader)
-- ...
+    expect(translator.translate('very.compound.key')).toBe(CATALOG.en.messages.very.compound.key); // => "The compound key"
+    expect(translator.withLocale('fr').translate('very.compound.key')).toBe(CATALOG.fr.messages.very.compound.key); // => "La clé composée"
+});
 
-### Build your translator
+test('Fake compound key translations', () => {
+    const translator = create(CATALOG);
 
-> Use [@jochlain/webpack-plugin-translations]() to generate file on compilation or create your own
+    expect(translator.translate('translations.are.incredible')).toBe(CATALOG.en.messages['translations.are.incredible']); // => "The translations are incredible."
+    expect(translator.withLocale('fr').translate('translations.are.incredible')).toBe(CATALOG.fr.messages['translations.are.incredible']); // => "Les traductions sont incroyables."
+});
 
-```javascript
-// assets/translator.js
+test('Plural translations', () => {
+    const translator = create(CATALOG);
+    const translatorEn = translator.withDomain('times');
+    const translatorFr = translatorEn.withLocale('fr');
 
-import createIntlTranslator from "@jochlain/translations";
-import formsEn from "../translations/forms.en.yaml";
-import formsFr from "../translations/forms.fr.yaml";
-import formsEn from "../translations/forms.en.yaml";
-import formsFr from "../translations/forms.fr.yaml";
-
-const translator = createIntlTranslator();
-translator.addCatalog(formsEn, 'forms', 'en');
-translator.addCatalog(formsFr, 'forms', 'fr');
-translator.addCatalog(messagesEn, 'messages', 'en');
-translator.addCatalog(messagesFr, 'messages', 'fr');
-
-export default translator;
-export const trans = translator.translate;
-```
-
-### Use your translator
-
-```javascript
-// assets/index.js
-
-import { trans } from "./translator";
-
-console.log(trans('hello'));
-```
+    expect(translatorEn.translate('diff.ago.year', { count: 1 })).toBe('1 year ago');
+    expect(translatorEn.translate('diff.ago.year', { count: 2 })).toBe('2 years ago');
+    expect(translatorFr.translate('diff.ago.year', { count: 1 })).toBe('il y a 1 an');
+    expect(translatorFr.translate('diff.ago.year', { count: 2 })).toBe('il y a 2 ans');
+});
