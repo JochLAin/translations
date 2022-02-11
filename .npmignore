@@ -1,7 +1,3 @@
-# Git
-/.git
-.gitignore
-
 # Development
 # /test
 # .babelrc.js
