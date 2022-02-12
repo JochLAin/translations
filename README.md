@@ -178,6 +178,8 @@ For more usage sample see [Jest test](https://github.com/JochLAin/translations/b
 
 ## Real-life project
 
+# [**_Work in progress the code below does not work_**](#real-life-project)
+
 > **Disclaimer :** This part is strongly inspired from [babel macros from fontawesome](https://fontawesome.com/docs/web/use-with/react/add-icons)
 
 In a real project, translations are not simple objects but files, like in a [Symfony project](https://symfony.com/).  
