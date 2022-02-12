@@ -1,8 +1,7 @@
 # Development
-# /test
-# .babelrc.js
-# *.ts
-# !*.d.ts
-# *.js.map
-# tsconfig.json
-# tslint.json
+/test
+/lib/*.ts
+/lib/!*.d.ts
+.babelrc.js
+tsconfig.json
+tslint.json
