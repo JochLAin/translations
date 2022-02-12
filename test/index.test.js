@@ -105,7 +105,7 @@ const CATALOG = {
         },
         times: {
             diff: {
-                empty: "ahora",
+                empty: "ora",
                 ago: {
                     year: "{count, plural, one {1 anno fa} other {# anni fa}}",
                     month: "{count, plural, one {1 mese fa} other {# mesi fa}}",

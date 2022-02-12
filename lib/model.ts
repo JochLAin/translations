@@ -1,5 +1,5 @@
 import format from "./format";
-import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
+import {CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType} from "./types";
 import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 
 class Translator {
@@ -58,10 +58,29 @@ class Translator {
     };
 
     addCatalog = (messages: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
-        this.translations.set(Translator.getKey(domain, locale), {
-            ...this.getCatalog(domain, locale),
-            ...messages
-        });
+        function merge(target?: CatalogType, ...sources: CatalogType[]): CatalogType {
+            if (!target) target = {};
+            if (!sources.length) return target;
+            const source = sources.shift();
+            if (typeof source === 'object') {
+                for (let keys = Object.keys(source), idx = 0; idx < keys.length; idx++) {
+                    const key = keys[idx];
+                    if (typeof source[key] === 'string') {
+                        Object.assign(target, { [key]: source[key] });
+                    } else {
+                        if (!target[key]) target[key] = {};
+                        if (typeof target[key] === 'string') target[key] = {};
+                        Object.assign(target[key], merge(target[key] as CatalogType, source[key] as CatalogType));
+                    }
+                }
+            }
+            return merge(target, ...sources);
+        }
+
+        this.translations.set(
+            Translator.getKey(domain, locale),
+            merge(this.getCatalog(domain, locale), messages)
+        );
 
         return this;
     };

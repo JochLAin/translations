@@ -3,8 +3,8 @@
     "rootDir": "./lib",
     "outDir": "./lib",
     "sourceMap": true,
-    "module": "ES2020",
-    "target": "ES5",
+    "module": "commonjs",
+    "target": "es2021",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
@@ -15,7 +15,10 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["es5"]
+    "lib": [
+      "es2021",
+      "dom"
+    ]
   },
   "include": ["./lib/*.ts"],
   "exclude": ["node_modules"]
