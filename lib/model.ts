@@ -1,8 +1,6 @@
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
-
-const DEFAULT_DOMAIN = 'messages';
-const DEFAULT_LOCALE = 'en';
+import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 
 class Translator {
     static create(translations: TranslationType, options: OptionsType = {}): Translator {
@@ -14,16 +12,23 @@ class Translator {
             .setFormatter(formatter)
             .setTranslations(translations)
         ;
-    };
+    }
+
+    static getKey(domain: string, locale: string): string {
+        return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
+    }
+
+    static translate(catalog: { [locale: string]: string }, replacements?: ReplacementType, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
+        const message = catalog[locale] || catalog[locale.split('_')[0]] || '';
+        if (!message) return '';
+        if (!replacements) replacements = {};
+        return formatter.format(message, replacements, locale);
+    }
 
     fallbackDomain: string = DEFAULT_DOMAIN;
     fallbackLocale: string = DEFAULT_LOCALE;
     formatter: FormatterType = { format };
     translations: Map<string, CatalogType>;
-
-    static getKey(domain: string, locale: string): string {
-        return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
-    }
 
     constructor(translations?: Map<string, CatalogType>) {
         this.translations = translations || new Map<string, CatalogType>();
@@ -68,6 +73,7 @@ class Translator {
 
         const message = this.getMessage(key, domain, locale);
         if (!message) return key;
+        if (!replacements) replacements = {};
         return this.formatter.format(message, replacements, locale);
     };
 
@@ -134,3 +140,4 @@ class Translator {
 
 export default Translator;
 export const create = Translator.create;
+export const translate = Translator.translate;

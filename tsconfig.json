@@ -14,7 +14,8 @@
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es5"]
   },
   "include": ["./lib/*.ts"],
   "exclude": ["node_modules"]

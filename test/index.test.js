@@ -1,4 +1,4 @@
-const { default: create } = require('../lib');
+const { default: create, translate } = require('../lib');
 
 const CATALOG = {
     en: {
@@ -199,4 +199,13 @@ test('Plural translations', () => {
     expect(translatorEn.translate('diff.ago.year', { count: 2 })).toBe('2 years ago');
     expect(translatorFr.translate('diff.ago.year', { count: 1 })).toBe('il y a 1 an');
     expect(translatorFr.translate('diff.ago.year', { count: 2 })).toBe('il y a 2 ans');
+});
+
+test('Static translations', () => {
+    expect(translate({ en: 'Hello', fr: 'Bonjour' })).toBe('Hello');
+    expect(translate({ en: 'Hello', fr: 'Bonjour' }, null, 'fr')).toBe('Bonjour');
+    expect(translate({ en: CATALOG.en.times.diff.ago.day, fr: CATALOG.fr.times.diff.ago.day }, { count: 1 })).toBe('1 day ago');
+    expect(translate({ en: CATALOG.en.times.diff.ago.day, fr: CATALOG.fr.times.diff.ago.day }, { count: 3 })).toBe('3 days ago');
+    expect(translate({ en: CATALOG.en.times.diff.ago.day, fr: CATALOG.fr.times.diff.ago.day }, { count: 1 }, 'fr')).toBe('il y a 1 jour');
+    expect(translate({ en: CATALOG.en.times.diff.ago.day, fr: CATALOG.fr.times.diff.ago.day }, { count: 3 }, 'fr')).toBe('il y a 3 jours');
 });

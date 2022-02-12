@@ -1,11 +1,14 @@
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 declare class Translator {
     static create(translations: TranslationType, options?: OptionsType): Translator;
+    static getKey(domain: string, locale: string): string;
+    static translate(catalog: {
+        [locale: string]: string;
+    }, replacements?: ReplacementType, locale?: string, formatter?: FormatterType): string;
     fallbackDomain: string;
     fallbackLocale: string;
     formatter: FormatterType;
     translations: Map<string, CatalogType>;
-    static getKey(domain: string, locale: string): string;
     constructor(translations?: Map<string, CatalogType>);
     getCatalog: (domain: string, locale: string) => CatalogType | undefined;
     getMessage: (key: string, domain: string, locale: string) => string;
@@ -22,3 +25,4 @@ declare class Translator {
 }
 export default Translator;
 export declare const create: typeof Translator.create;
+export declare const translate: typeof Translator.translate;

@@ -1,10 +1,21 @@
 import { IntlMessageFormat } from "intl-messageformat";
-import Translator, { create } from './model';
+import { DEFAULT_LOCALE } from "./contants";
+import Translator, { create, translate } from './model';
 import { ReplacementType, TranslationType } from "./types";
 
-export default (translations: TranslationType, locale?: string, domain?: string) => {
-    const formatter = { format: (message: string, replacements: ReplacementType, locale: string): string => String((new IntlMessageFormat(message, locale)).format(replacements)) };
+const formatter = {
+    format: (message: string, replacements?: ReplacementType, locale: string = DEFAULT_LOCALE): string => {
+        return String((new IntlMessageFormat(message, locale)).format(replacements));
+    }
+};
+
+const createIntl = (translations: TranslationType, locale?: string, domain?: string) => {
     return create(translations, { domain, locale, formatter });
 };
 
-export { Translator, create };
+const translateIntl = (catalog: { [locale: string]: string }, replacements?: ReplacementType, locale?: string) => {
+    return translate(catalog, replacements, locale, formatter);
+};
+
+export default createIntl;
+export { Translator, create, translateIntl as translate };

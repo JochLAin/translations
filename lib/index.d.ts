@@ -1,5 +1,8 @@
 import Translator, { create } from './model';
-import { TranslationType } from "./types";
-declare const _default: (translations: TranslationType, locale?: string | undefined, domain?: string | undefined) => Translator;
-export default _default;
-export { Translator, create };
+import { ReplacementType, TranslationType } from "./types";
+declare const createIntl: (translations: TranslationType, locale?: string | undefined, domain?: string | undefined) => Translator;
+declare const translateIntl: (catalog: {
+    [locale: string]: string;
+}, replacements?: ReplacementType | undefined, locale?: string | undefined) => string;
+export default createIntl;
+export { Translator, create, translateIntl as translate };
