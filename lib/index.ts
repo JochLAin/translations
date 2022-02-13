@@ -1,5 +1,5 @@
 import format from "./format";
-import {CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType} from "./types";
+import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 
 export class Translator {
@@ -17,6 +17,26 @@ export class Translator {
     static getKey(domain: string, locale: string): string {
         return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
     }
+
+    static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType {
+        if (!target) target = {};
+        if (!sources.length) return target;
+        const source = sources.shift();
+        if (typeof source === 'object') {
+            for (let keys = Object.keys(source), idx = 0; idx < keys.length; idx++) {
+                const key = keys[idx];
+                if (typeof source[key] === 'string') {
+                    Object.assign(target, {[key]: source[key]});
+                } else {
+                    if (!target[key]) target[key] = {};
+                    if (typeof target[key] === 'string') target[key] = {};
+                    Object.assign(target[key], Translator.mergeCatalogs(target[key] as CatalogType, source[key] as CatalogType));
+                }
+            }
+        }
+
+        return Translator.mergeCatalogs(target, ...sources);
+    };
 
     static translate(catalog: { [locale: string]: string }, replacements?: ReplacementType, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
         const message = catalog[locale] || catalog[locale.split('_')[0]] || '';
@@ -57,29 +77,10 @@ export class Translator {
         return getValue(this.getCatalog(domain, locale), ...key.split('.'));
     };
 
-    addCatalog = (messages: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
-        function merge(target?: CatalogType, ...sources: CatalogType[]): CatalogType {
-            if (!target) target = {};
-            if (!sources.length) return target;
-            const source = sources.shift();
-            if (typeof source === 'object') {
-                for (let keys = Object.keys(source), idx = 0; idx < keys.length; idx++) {
-                    const key = keys[idx];
-                    if (typeof source[key] === 'string') {
-                        Object.assign(target, { [key]: source[key] });
-                    } else {
-                        if (!target[key]) target[key] = {};
-                        if (typeof target[key] === 'string') target[key] = {};
-                        Object.assign(target[key], merge(target[key] as CatalogType, source[key] as CatalogType));
-                    }
-                }
-            }
-            return merge(target, ...sources);
-        }
-
+    addCatalog = (catalog: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
         this.translations.set(
             Translator.getKey(domain, locale),
-            merge(this.getCatalog(domain, locale), messages)
+            Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog)
         );
 
         return this;
@@ -158,4 +159,5 @@ export class Translator {
 }
 
 export default Translator.create;
+export const merge = Translator.mergeCatalogs;
 export const translate = Translator.translate;
