@@ -18,6 +18,23 @@ export class Translator {
         return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
     }
 
+    static visitCatalog = (catalog: CatalogType|undefined, key: string): string => {
+        const visit = (catalog: CatalogType|string|undefined, ...keys: string[]): string => {
+            if (!catalog) return key;
+            if (typeof catalog === 'string') return catalog;
+            let currentKey = '';
+            while (keys.length) {
+                const shifted = keys.shift() || ''; // For point end sentence
+                if (!currentKey) currentKey = shifted;
+                else currentKey += `.${shifted}`;
+                const value = catalog[currentKey];
+                if (value) return visit(catalog[currentKey], ...keys);
+            }
+            return '';
+        };
+        return visit(catalog, ...key.split('.'));
+    };
+
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType {
         if (!target) target = {};
         if (!sources.length) return target;
@@ -52,7 +69,50 @@ export class Translator {
 
     constructor(translations?: Map<string, CatalogType>) {
         this.translations = translations || new Map<string, CatalogType>();
+
+        return new Proxy(this, {
+            get(target: Translator, property: string | symbol, receiver: any): any {
+                if (typeof property === 'string') {
+                    if (['fallbackDomain', 'fallbackLocale', 'formatter'].includes(property)) {
+                        return Reflect.get(target, `_${property}`, receiver);
+                    }
+                    if ('translations' === property) {
+                        return [...target.translations.entries()].reduce((accu: TranslationType, [key, catalog]) => {
+                            const [domain, locale] = key.split('-');
+                            if (!accu[locale]) accu[locale] = {};
+                            accu[locale][domain] = catalog;
+
+                            return accu;
+                        }, {});
+                    }
+                }
+                return Reflect.get(target, property, receiver);
+            },
+            set(target: Translator, property: string | symbol, value: any, receiver: any): boolean {
+                if (typeof property === 'string') {
+                    switch (property) {
+                        case 'fallbackDomain':
+                            return !!target.setFallbackDomain(value);
+                        case 'fallbackLocale':
+                            return !!target.setFallbackLocale(value);
+                        case 'formatter':
+                            return !!target.setFormatter(value);
+                        case 'translations':
+                            return !!target.setTranslations(value);
+                    }
+                }
+                return Reflect.set(target, property, receiver);
+            }
+        });
     }
+
+    addCatalog = (catalog: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
+        const key = Translator.getKey(domain, locale);
+        const value = Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog);
+        this.translations.set(key, value);
+
+        return this;
+    };
 
     getCatalog = (domain: string, locale: string): CatalogType|undefined => {
         const catalog = this.translations.get(Translator.getKey(domain, locale));
@@ -61,40 +121,7 @@ export class Translator {
     };
 
     getMessage = (key: string, domain: string, locale: string): string => {
-        const getValue = (catalog: CatalogType|string|undefined, ...keys: string[]): string => {
-            if (!catalog) return key;
-            if (typeof catalog === 'string') return catalog;
-            let currentKey = '';
-            while (keys.length) {
-                const shifted = keys.shift() || ''; // For point end sentence
-                if (!currentKey) currentKey = shifted;
-                else currentKey += `.${shifted}`;
-                const value = catalog[currentKey];
-                if (value) return getValue(catalog[currentKey], ...keys);
-            }
-            return '';
-        };
-        return getValue(this.getCatalog(domain, locale), ...key.split('.'));
-    };
-
-    addCatalog = (catalog: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
-        this.translations.set(
-            Translator.getKey(domain, locale),
-            Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog)
-        );
-
-        return this;
-    };
-
-    translate = (key: string, replacements?: ReplacementType, domain?: string, locale?: string): string => {
-        if (!replacements) replacements = {};
-        if (!domain) domain = this.fallbackDomain;
-        if (!locale) locale = this.fallbackLocale;
-
-        const message = this.getMessage(key, domain, locale);
-        if (!message) return key;
-        if (!replacements) replacements = {};
-        return this.formatter.format(message, replacements, locale);
+        return Translator.visitCatalog(this.getCatalog(domain, locale), key);
     };
 
     setFallbackDomain = (domain: string = DEFAULT_DOMAIN): this => {
@@ -123,6 +150,17 @@ export class Translator {
             });
         });
         return this;
+    };
+
+    translate = (key: string, replacements?: ReplacementType, domain?: string, locale?: string): string => {
+        if (!replacements) replacements = {};
+        if (!domain) domain = this.fallbackDomain;
+        if (!locale) locale = this.fallbackLocale;
+
+        const message = this.getMessage(key, domain, locale);
+        if (!message) return key;
+        if (!replacements) replacements = {};
+        return this.formatter.format(message, replacements, locale);
     };
 
     withDomain = (domain: string): Translator => {
@@ -161,3 +199,4 @@ export class Translator {
 export default Translator.create;
 export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
+export const visitCatalog = Translator.visitCatalog;

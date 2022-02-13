@@ -2,6 +2,7 @@ import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationTy
 export declare class Translator {
     static create(translations: TranslationType, options?: OptionsType): Translator;
     static getKey(domain: string, locale: string): string;
+    static visitCatalog: (catalog: CatalogType | undefined, key: string) => string;
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType;
     static translate(catalog: {
         [locale: string]: string;
@@ -11,14 +12,14 @@ export declare class Translator {
     formatter: FormatterType;
     translations: Map<string, CatalogType>;
     constructor(translations?: Map<string, CatalogType>);
+    addCatalog: (catalog: CatalogType, domain?: string, locale?: string) => this;
     getCatalog: (domain: string, locale: string) => CatalogType | undefined;
     getMessage: (key: string, domain: string, locale: string) => string;
-    addCatalog: (catalog: CatalogType, domain?: string, locale?: string) => this;
-    translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
     setFallbackDomain: (domain?: string) => this;
     setFallbackLocale: (locale?: string) => this;
     setFormatter: (formatter?: FormatterType | undefined) => this;
     setTranslations: (translations: TranslationType) => this;
+    translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
     withDomain: (domain: string) => Translator;
     withFormatter: (formatter: FormatterType) => Translator;
     withLocale: (locale: string) => Translator;
@@ -28,3 +29,4 @@ declare const _default: typeof Translator.create;
 export default _default;
 export declare const mergeCatalogs: typeof Translator.mergeCatalogs;
 export declare const translate: typeof Translator.translate;
+export declare const visitCatalog: (catalog: CatalogType | undefined, key: string) => string;
