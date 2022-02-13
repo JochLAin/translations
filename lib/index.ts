@@ -159,5 +159,5 @@ export class Translator {
 }
 
 export default Translator.create;
-export const merge = Translator.mergeCatalogs;
+export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
