@@ -1,6 +1,6 @@
+import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
-import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 
 export class Translator {
     static create(translations: TranslationType, options: OptionsType = {}): Translator {
@@ -18,7 +18,7 @@ export class Translator {
         return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
     }
 
-    static visitCatalog = (catalog: CatalogType|undefined, key: string): string => {
+    static getCatalogValue = (catalog: CatalogType|undefined, key: string): string => {
         const visit = (catalog: CatalogType|string|undefined, ...keys: string[]): string => {
             if (!catalog) return key;
             if (typeof catalog === 'string') return catalog;
@@ -121,7 +121,7 @@ export class Translator {
     };
 
     getMessage = (key: string, domain: string, locale: string): string => {
-        return Translator.visitCatalog(this.getCatalog(domain, locale), key);
+        return Translator.getCatalogValue(this.getCatalog(domain, locale), key);
     };
 
     setFallbackDomain = (domain: string = DEFAULT_DOMAIN): this => {
@@ -199,4 +199,10 @@ export class Translator {
 export default Translator.create;
 export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
-export const visitCatalog = Translator.visitCatalog;
+export const getCatalogValue = Translator.getCatalogValue;
+
+/** @deprecated use mergeCatalogs instead */
+export const merge = Translator.mergeCatalogs;
+
+/** @deprecated use getCatalogValue instead */
+export const visitCatalog = Translator.getCatalogValue;

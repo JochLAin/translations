@@ -2,7 +2,7 @@ import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationTy
 export declare class Translator {
     static create(translations: TranslationType, options?: OptionsType): Translator;
     static getKey(domain: string, locale: string): string;
-    static visitCatalog: (catalog: CatalogType | undefined, key: string) => string;
+    static getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType;
     static translate(catalog: {
         [locale: string]: string;
@@ -29,4 +29,6 @@ declare const _default: typeof Translator.create;
 export default _default;
 export declare const mergeCatalogs: typeof Translator.mergeCatalogs;
 export declare const translate: typeof Translator.translate;
+export declare const getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
+export declare const merge: typeof Translator.mergeCatalogs;
 export declare const visitCatalog: (catalog: CatalogType | undefined, key: string) => string;
