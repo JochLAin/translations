@@ -1,6 +1,6 @@
 {
   "name": "@jochlain/translations",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Translation module that support Intl format",
   "main": "lib/index.js",
   "scripts": {
