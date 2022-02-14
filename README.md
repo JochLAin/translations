@@ -71,7 +71,7 @@ const CATALOG = {
 </details>
 
 ```javascript
-import createTranslator from "@jochlain/translations";
+import createTranslator, { translate } from "@jochlain/translations";
 
 const translator = createTranslator(CATALOG);
 console.log(translator.translate('hello')); // => "Hi"
@@ -93,9 +93,12 @@ const translatorFormsFr = translatorFormsEn.withLocale('fr');
 
 console.log(translatorFormsEn.translate('This field is required.')); // => "This field is required."
 console.log(translatorFormsFr.translate('This field is required.')); // => "Ce champs est obligatoire."
+
+console.log(translate({ en: 'Hello', fr: 'Bonjour' })); // => "Hello"
+console.log(translate({ en: 'Hello', fr: 'Bonjour' }, null, 'fr')); // => "Bonjour"
 ```
 
-For more usage sample see [Jest test](https://github.com/JochLAin/translations/blob/main/test/index.test.js)
+For more usage sample see [Jest test](https://github.com/JochLAin/translations/blob/main/test/)
 
 ## Intl integration
 
