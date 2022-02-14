@@ -19,7 +19,7 @@ export class Translator {
     }
 
     static getCatalogValue = (catalog: CatalogType|undefined, key: string): string => {
-        const visit = (catalog: CatalogType|string|undefined, ...keys: string[]): string => {
+        const closure = (catalog: CatalogType|string|undefined, ...keys: string[]): string => {
             if (!catalog) return key;
             if (typeof catalog === 'string') return catalog;
             let currentKey = '';
@@ -28,11 +28,11 @@ export class Translator {
                 if (!currentKey) currentKey = shifted;
                 else currentKey += `.${shifted}`;
                 const value = catalog[currentKey];
-                if (value) return visit(catalog[currentKey], ...keys);
+                if (value) return closure(catalog[currentKey], ...keys);
             }
-            return '';
+            return key;
         };
-        return visit(catalog, ...key.split('.'));
+        return closure(catalog, ...key.split('.'));
     };
 
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType {
