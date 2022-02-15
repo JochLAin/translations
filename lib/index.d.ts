@@ -27,9 +27,10 @@ export declare class Translator {
     withLocale: (locale: string) => Translator;
     with: (options: OptionsType) => Translator;
 }
-export declare const create: typeof Translator.create;
+export declare const createTranslator: typeof Translator.create;
 export declare const mergeCatalogs: typeof Translator.mergeCatalogs;
 export declare const translate: typeof Translator.translate;
 export declare const getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
+export declare const create: typeof Translator.create;
 export declare const merge: typeof Translator.mergeCatalogs;
 export declare const visitCatalog: (catalog: CatalogType | undefined, key: string) => string;

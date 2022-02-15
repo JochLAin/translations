@@ -205,10 +205,13 @@ export class Translator {
     };
 }
 
-export const create = Translator.create;
+export const createTranslator = Translator.create;
 export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
 export const getCatalogValue = Translator.getCatalogValue;
+
+/** @deprecated use createTranslator instead */
+export const create = Translator.create;
 
 /** @deprecated use mergeCatalogs instead */
 export const merge = Translator.mergeCatalogs;
