@@ -1,26 +1,6 @@
 import Translator, { translate } from '../lib';
 import CATALOG from './constant';
 
-test('Default export as method', () => {
-    const translator = Translator({
-        en: { messages: { hello: 'Hello' } },
-        fr: { messages: { hello: 'Bonjour' } }
-    });
-
-    expect(translator.translate('hello')).toBe('Hello'); // => "Hello"
-    expect(translator.translate('hello', null, null, 'fr')).toBe('Bonjour'); // => "Hello"
-});
-
-test('Default export as constructor', () => {
-    const translations = new Map();
-    translations.set('messages-en', { hello: 'Hello' });
-    translations.set('messages-fr', { hello: 'Bonjour' });
-
-    const translator = new Translator(translations);
-    expect(translator.translate('hello')).toBe('Hello');
-    expect(translator.translate('hello', null, null, 'fr')).toBe('Bonjour');
-});
-
 test('Simple translations with domain parameter', () => {
     const translator = Translator(CATALOG);
     expect(translator.translate('This field is required.', null, 'forms')).toBe(CATALOG.en.forms["This field is required."]); // => "This field is required."

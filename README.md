@@ -1,11 +1,7 @@
-# Translation module _@jochlain/translations_
+# Translation module
 
-<small>_Remove Intl support in order to remove all dependencies_</small>
-
-### ⚠ Work in progress
-
-Can work with Symfony in Node or with Webpack (Encore)  
-See [how to integrate](https://www.npmjs.com/package/@jochlain/babel-macro-translations)
+Can work with Symfony translations structure in Node environment and/or with Webpack (Encore)  
+See [how to integrate](https://www.npmjs.com/package/@jochlain/translations-json)
 
 ## Summary
 
@@ -71,9 +67,9 @@ const CATALOG = {
 </details>
 
 ```javascript
-import createTranslator, { translate } from "@jochlain/translations";
+import Translator, { translate } from "@jochlain/translations";
 
-const translator = createTranslator(CATALOG);
+const translator = Translator(CATALOG);
 console.log(translator.translate('hello')); // => "Hi"
 console.log(translator.translate('hello', null, null, 'fr')); // => "Bonjour"
 
@@ -102,10 +98,16 @@ For more usage sample see [Jest test](https://github.com/JochLAin/translations/b
 
 ## Intl integration
 
+### Installation
+
+`npm i -S intl-messageformat`
+
+### Usage
+
 ```javascript
-import createTranslator from "@jochlain/translations";
+import Translator from "@jochlain/translations";
 import { IntlMessageFormat } from "intl-messageformat";
 
 const formatter = { format: (message, replacements, locale) => (new IntlMessageFormat(message, locale).format(replacements)) };
-const translator = createTranslator(CATALOG, { formatter });
+const translator = Translator(CATALOG, { formatter });
 ```

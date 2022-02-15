@@ -2,15 +2,6 @@ import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 
-export default new Proxy(() => {}, {
-    apply(target: () => void, thisArg: any, args: [TranslationType, OptionsType]): Translator {
-        return Translator.create(...args);
-    },
-    construct(target: () => void, args: any[]): Translator {
-        return new Translator(...args);
-    }
-});
-
 export class Translator {
     static create(translations: TranslationType, options: OptionsType = {}): Translator {
         const { domain = DEFAULT_DOMAIN, locale = DEFAULT_LOCALE, formatter } = options;
@@ -204,6 +195,18 @@ export class Translator {
         ;
     };
 }
+
+export default new Proxy(Translator, {
+    apply(target: typeof Translator, thisArg: any, args: [TranslationType, OptionsType]): Translator {
+        return Translator.create(...args);
+    },
+    construct(target: typeof Translator, args: any[]): Translator {
+        return new Translator(...args);
+    },
+    set(): boolean {
+        throw new Error('It\'s not allowed to add a property to Translator class, please use a composition relation instead.');
+    }
+});
 
 export const createTranslator = Translator.create;
 export const mergeCatalogs = Translator.mergeCatalogs;
