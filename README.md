@@ -1,7 +1,9 @@
 # Translation module
 
-Can work with Symfony translations structure in Node environment and/or with Webpack (Encore)  
-See [how to integrate](https://www.npmjs.com/package/@jochlain/translations-json)
+Can work with Symfony translations structure in Node environment and/or with Webpack using Babel.  
+See how to integrate with :
+- [YAML files](https://www.npmjs.com/package/@jochlain/translations-yaml)
+- [JSON files](https://www.npmjs.com/package/@jochlain/translations-json)
 
 ## Summary
 
