@@ -2,8 +2,8 @@ import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 
-export class Translator {
-    static create(translations: TranslationType, options: OptionsType = {}): Translator {
+class Translator {
+    static create(translations: TranslationType = {}, options: OptionsType = {}): Translator {
         const { domain = DEFAULT_DOMAIN, locale = DEFAULT_LOCALE, formatter } = options;
 
         return (new Translator())
@@ -55,10 +55,9 @@ export class Translator {
         return Translator.mergeCatalogs(target, ...sources);
     };
 
-    static translate(catalog: { [locale: string]: string }, replacements?: ReplacementType, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
+    static translate(catalog: { [locale: string]: string } = {}, replacements: ReplacementType = {}, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
         const message = catalog[locale] || catalog[locale.split('_')[0]] || '';
         if (!message) return '';
-        if (!replacements) replacements = {};
         return formatter.format(message, replacements, locale);
     }
 
@@ -106,7 +105,7 @@ export class Translator {
         });
     }
 
-    addCatalog = (catalog: CatalogType, domain: string = DEFAULT_DOMAIN, locale: string = this.fallbackLocale): this => {
+    addCatalog = (catalog: CatalogType = {}, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): this => {
         const key = Translator.getKey(domain, locale);
         const value = Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog);
         this.translations.set(key, value);
@@ -114,10 +113,12 @@ export class Translator {
         return this;
     };
 
-    getCatalog = (domain: string, locale: string): CatalogType|undefined => {
+    getCatalog = (domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): CatalogType|undefined => {
         const catalog = this.translations.get(Translator.getKey(domain, locale));
         if (catalog) return catalog;
-        return this.translations.get(Translator.getKey(domain, locale.split('_')[0]));
+        if (domain.includes('_')) {
+            return this.translations.get(Translator.getKey(domain, locale.split('_')[0]));
+        }
     };
 
     getMessage = (key: string, domain: string, locale: string): string => {
@@ -196,7 +197,7 @@ export class Translator {
     };
 }
 
-export default new Proxy(Translator, {
+const proxy = new Proxy(Translator, {
     apply(target: typeof Translator, thisArg: any, args: [TranslationType, OptionsType]): Translator {
         return Translator.create(...args);
     },
@@ -208,10 +209,14 @@ export default new Proxy(Translator, {
     }
 });
 
+export default proxy;
+export { DEFAULT_DOMAIN, DEFAULT_LOCALE };
+export { proxy as Translator }
 export const createTranslator = Translator.create;
+export const formatMessage = format;
+export const getCatalogValue = Translator.getCatalogValue;
 export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
-export const getCatalogValue = Translator.getCatalogValue;
 
 /** @deprecated use createTranslator instead */
 export const create = Translator.create;
