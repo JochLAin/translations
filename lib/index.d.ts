@@ -1,4 +1,6 @@
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
+declare const _default: () => void;
+export default _default;
 export declare class Translator {
     static create(translations: TranslationType, options?: OptionsType): Translator;
     static getKey(domain: string, locale: string): string;
@@ -25,8 +27,7 @@ export declare class Translator {
     withLocale: (locale: string) => Translator;
     with: (options: OptionsType) => Translator;
 }
-declare const _default: typeof Translator.create;
-export default _default;
+export declare const create: typeof Translator.create;
 export declare const mergeCatalogs: typeof Translator.mergeCatalogs;
 export declare const translate: typeof Translator.translate;
 export declare const getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;

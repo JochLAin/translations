@@ -2,6 +2,15 @@ import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 
+export default new Proxy(() => {}, {
+    apply(target: () => void, thisArg: any, args: [TranslationType, OptionsType]): Translator {
+        return Translator.create(...args);
+    },
+    construct(target: () => void, args: any[]): Translator {
+        return new Translator(...args);
+    }
+});
+
 export class Translator {
     static create(translations: TranslationType, options: OptionsType = {}): Translator {
         const { domain = DEFAULT_DOMAIN, locale = DEFAULT_LOCALE, formatter } = options;
@@ -196,7 +205,7 @@ export class Translator {
     };
 }
 
-export default Translator.create;
+export const create = Translator.create;
 export const mergeCatalogs = Translator.mergeCatalogs;
 export const translate = Translator.translate;
 export const getCatalogValue = Translator.getCatalogValue;

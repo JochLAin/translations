@@ -1,31 +1,44 @@
-import create, { translate } from '../lib';
+import Translator, { translate } from '../lib';
 import CATALOG from './constant';
 
-const translator = create(CATALOG);
+test('Default export as method', () => {
+    const translator = Translator({
+        en: { messages: { hello: 'Hello' } },
+        fr: { messages: { hello: 'Bonjour' } }
+    });
 
-test('Simplest translations', () => {
-    expect(translator.translate('hello')).toBe(CATALOG.en.messages.hello); // => "Hello"
+    expect(translator.translate('hello')).toBe('Hello'); // => "Hello"
+    expect(translator.translate('hello', null, null, 'fr')).toBe('Bonjour'); // => "Hello"
 });
 
-test('Simple translations with locale parameter', () => {
-    expect(translator.translate('hello', null, null, 'fr')).toBe(CATALOG.fr.messages.hello); // => "Bonjour"
+test('Default export as constructor', () => {
+    const translations = new Map();
+    translations.set('messages-en', { hello: 'Hello' });
+    translations.set('messages-fr', { hello: 'Bonjour' });
+
+    const translator = new Translator(translations);
+    expect(translator.translate('hello')).toBe('Hello');
+    expect(translator.translate('hello', null, null, 'fr')).toBe('Bonjour');
 });
 
 test('Simple translations with domain parameter', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('This field is required.', null, 'forms')).toBe(CATALOG.en.forms["This field is required."]); // => "This field is required."
     expect(translator.translate('This field is required.', null, 'forms', 'fr')).toBe(CATALOG.fr.forms["This field is required."]); // => "Ce champs est obligatoire."
 });
 
 test('Simple translations with unknown domain parameter', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('hello', null, 'validators')).toBe('hello');
 });
 
 test('Simple translations with uninformed locale parameter', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('hello', null, null, 'ar')).toBe('hello');
 });
 
 test('Simple translations with default locale', () => {
-    const translator = create(CATALOG, { locale: 'fr' });
+    const translator = Translator(CATALOG, { locale: 'fr' });
 
     expect(translator.translate('hello')).toBe(CATALOG.fr.messages.hello); // => "Bonjour"
     expect(translator.translate('hello', null, null, 'en')).toBe(CATALOG.en.messages.hello); // => "Hello"
@@ -34,6 +47,7 @@ test('Simple translations with default locale', () => {
 });
 
 test('Simple translation with helpers', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('hello')).toBe(CATALOG.en.messages.hello); // => "Hello"
     expect(translator.withLocale('fr').translate('hello')).toBe(CATALOG.fr.messages.hello); // => "Bonjour"
     expect(translator.withDomain('forms').translate('This field is required.')).toBe(CATALOG.en.forms['This field is required.']); // => "This field is required."
@@ -41,16 +55,19 @@ test('Simple translation with helpers', () => {
 });
 
 test('Compound key translations', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('very.compound.key')).toBe(CATALOG.en.messages.very.compound.key); // => "The compound key"
     expect(translator.withLocale('fr').translate('very.compound.key')).toBe(CATALOG.fr.messages.very.compound.key); // => "La clé composée"
 });
 
 test('Fake compound key translations', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('translations.are.incredible')).toBe(CATALOG.en.messages['translations.are.incredible']); // => "The translations are incredible."
     expect(translator.withLocale('fr').translate('translations.are.incredible')).toBe(CATALOG.fr.messages['translations.are.incredible']); // => "Les traductions sont incroyables."
 });
 
 test('Parameter translations', () => {
+    const translator = Translator(CATALOG);
     expect(translator.translate('helloYou', { '%name%': "Tony" })).toBe('Hello Tony');
 });
 
