@@ -1,5 +1,7 @@
 # Translation module
 
+From a [catalog of translations](#types), translate your content with or not parameters.
+
 Can work with Symfony translations structure in Node environment and/or with Webpack using Babel.  
 See how to integrate with :
 - [YAML files](https://www.npmjs.com/package/@jochlain/translations-yaml)
@@ -10,6 +12,12 @@ See how to integrate with :
 - [Installation](#installation)
 - [Usage](#usage)
 - [Example with Intl integration](#intl-integration)
+  - [Installation of Intl](#intl-installation)
+  - [Usage with Intl](#usage-with-intl)
+- [Q&A](#questions-and-answers)
+  - [Why ?](#why-)
+  - [Who ?](#who-)
+  - [Where ?](#where-)
 - [Documentation](#documentation)
   - [Constant](#constants)
   - [Types](#types)
@@ -109,11 +117,11 @@ For more usage sample see [Jest test](https://github.com/JochLAin/translations/b
 
 ## Intl integration
 
-### Installation
+### Intl installation
 
 `npm i -S intl-messageformat`
 
-### Usage
+### Usage with Intl
 
 ```javascript
 import Translator from "@jochlain/translations";
@@ -122,6 +130,23 @@ import { IntlMessageFormat } from "intl-messageformat";
 const formatter = { format: (message, replacements, locale) => (new IntlMessageFormat(message, locale).format(replacements)) };
 const translator = Translator(CATALOG, { formatter });
 ```
+
+## Questions and answers
+
+### Why ?
+
+Because I can't found a simple and secured way to send translations to front shared by server.
+
+### Who ?
+
+For little project directly or bigger project with babel macro.
+
+- Load translations from [JSON files](https://www.npmjs.com/package/@jochlain/translations-json)
+- Load translations from [YAML files](https://www.npmjs.com/package/@jochlain/translations-yaml)
+
+### Where ?
+
+In a node / browser / compiled / SSR.
 
 ## Documentation
 
@@ -260,7 +285,7 @@ Translate a message from a simple catalog
 A string representing the translated message.
 </details>
 
-### Methods
+#### Methods
 
 <details id="method-addCatalog">
     <summary><code>addCatalog(catalog, domain, locale)</code></summary>
@@ -269,11 +294,11 @@ Add a catalog to translations map
 
 ##### Parameters
 
-| Name    | Type                  | Default                    |
-|---------|-----------------------|----------------------------|
-| catalog | [CatalogType](#types) | `{}`                       |
-| locale  | string                | [fallbackLocale](#members) |
-| domain  | string                | [fallbackDomain](#members) |
+| Name    | Type                  | Default                         |
+|---------|-----------------------|---------------------------------|
+| catalog | [CatalogType](#types) | `{}`                            |
+| locale  | string                | this.[fallbackLocale](#members) |
+| domain  | string                | this.[fallbackDomain](#members) |
 
 ##### Return value
 
@@ -288,10 +313,10 @@ If `locale` is like `en_US` it looks first for a `en_US` catalog and if not look
 
 ##### Parameters
 
-| Name    | Type                  | Default                    |
-|---------|-----------------------|----------------------------|
-| locale  | string                | [fallbackLocale](#members) |
-| domain  | string                | [fallbackDomain](#members) |
+| Name    | Type   | Default                         |
+|---------|--------|---------------------------------|
+| locale  | string | this.[fallbackLocale](#members) |
+| domain  | string | this.[fallbackDomain](#members) |
 
 ##### Return value
 
@@ -306,11 +331,11 @@ See [getCatalog](#method-getCatalog) and [getCatalogValue](#static-method-getCat
 
 ##### Parameters
 
-| Name   | Type                  | Default                    |
-|--------|-----------------------|----------------------------|
-| key    | string                | none                       |
-| locale | string                | [fallbackLocale](#members) |
-| domain | string                | [fallbackDomain](#members) |
+| Name   | Type   | Default                         |
+|--------|--------|---------------------------------|
+| key    | string | none                            |
+| locale | string | this.[fallbackLocale](#members) |
+| domain | string | this.[fallbackDomain](#members) |
 
 ##### Return value
 
@@ -324,9 +349,9 @@ Set the [fallbackDomain](#members) member
 
 ##### Parameters
 
-| Name   | Type                  | Default                      |
-|--------|-----------------------|------------------------------|
-| domain | string                | [DEFAULT_DOMAIN](#constants) |
+| Name   | Type   | Default                      |
+|--------|--------|------------------------------|
+| domain | string | [DEFAULT_DOMAIN](#constants) |
 
 ##### Return value
 
@@ -340,9 +365,9 @@ Set the [fallbackLocale](#members) member
 
 ##### Parameters
 
-| Name   | Type                  | Default                      |
-|--------|-----------------------|------------------------------|
-| locale | string                | [DEFAULT_LOCALE](#constants) |
+| Name   | Type   | Default                      |
+|--------|--------|------------------------------|
+| locale | string | [DEFAULT_LOCALE](#constants) |
 
 ##### Return value
 
@@ -381,6 +406,84 @@ Set the [formatter](#members) member
 The Translator instance
 </details>
 
+<details id="method-withDomain">
+    <summary><code>withDomain(domain)</code></summary>
+
+Clone instance with fallbackDomain domain parameter 
+
+##### Parameters
+
+| Name   | Type   |
+|--------|--------|
+| domain | string |
+
+##### Return value
+
+A new Translator instance
+</details>
+
+<details id="method-withFormatter">
+    <summary><code>withFormatter(formatter)</code></summary>
+
+Clone instance with formatter
+
+##### Parameters
+
+| Name      | Type                    |
+|-----------|-------------------------|
+| formatter | [FormatterType](#types) |
+
+##### Return value
+
+A new Translator instance
+</details>
+
+<details id="method-withLocale">
+    <summary><code>withLocale(locale)</code></summary>
+
+Clone instance with fallbackLocale locale parameter 
+
+##### Parameters
+
+| Name   | Type   |
+|--------|--------|
+| locale | string |
+
+##### Return value
+
+A new Translator instance
+</details>
+
+<details id="method-with">
+    <summary><code>with({ domain, formatter, locale })</code></summary>
+
+Clone instance with domain, formatter, locale.
+
+##### Parameters
+
+| Name      | Type          | Default                         |
+|-----------|---------------|---------------------------------|
+| domain    | string        | this.[fallbackDomain](#members) |
+| locale    | string        | this.[fallbackLocale](#members) |
+| formatter | FormatterType | this.[formatter](#members)      |
+
+##### Return value
+
+A new Translator instance
+</details>
 
 ### Default format method
 
+By default, format method search each replacement key with a RegExp and replace them by their values.  
+That's the next part I'm going to look at.
+
+```javascript
+function format(message: string, replacements: ReplacementType, locale: string = DEFAULT_LOCALE) {
+    let result = message;
+    for (let keys = Object.keys(replacements), idx = 0; idx < keys.length; idx++) {
+        result = result.replace(new RegExp(`${keys[idx]}`, 'g'), String(replacements[keys[idx]]));
+    }
+
+    return result;
+}
+```

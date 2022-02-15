@@ -1,4 +1,4 @@
-import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./contants";
+import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./constants";
 import format from "./format";
 import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
 
@@ -57,7 +57,8 @@ class Translator {
 
     static translate(catalog: { [locale: string]: string } = {}, replacements: ReplacementType = {}, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
         const message = catalog[locale] || catalog[locale.split('_')[0]] || '';
-        if (!message) return '';
+        if (!message) return ''
+        if (!replacements) replacements = {};
         return formatter.format(message, replacements, locale);
     }
 
