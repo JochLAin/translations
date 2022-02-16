@@ -1,6 +1,19 @@
 import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./constants";
 import format from "./format";
-import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
+
+export type FormatType = (message: string, replacements: ReplacementType, locale: string) => string;
+export type FormatterType = { format: FormatType };
+
+export type CatalogType = { [key: string]: CatalogType|string };
+export type DomainType = { [domain: string]: CatalogType };
+export type ReplacementType = { [key: string]: any };
+export type TranslationType = { [locale: string]: DomainType };
+
+export type OptionsType = {
+    locale?: string,
+    domain?: string,
+    formatter?: FormatterType,
+};
 
 class Translator {
     static create(translations: TranslationType = {}, options: OptionsType = {}): Translator {
@@ -106,7 +119,7 @@ class Translator {
         });
     }
 
-    addCatalog = (catalog: CatalogType = {}, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): this => {
+    addCatalog = (catalog: CatalogType = {}, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): Translator => {
         const key = Translator.getKey(domain, locale);
         const value = Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog);
         this.translations.set(key, value);
@@ -126,17 +139,17 @@ class Translator {
         return Translator.getCatalogValue(this.getCatalog(domain, locale), key);
     };
 
-    setFallbackDomain = (domain: string = DEFAULT_DOMAIN): this => {
+    setFallbackDomain = (domain: string = DEFAULT_DOMAIN): Translator => {
         this.fallbackDomain = domain;
         return this;
     };
 
-    setFallbackLocale = (locale: string = DEFAULT_LOCALE): this => {
+    setFallbackLocale = (locale: string = DEFAULT_LOCALE): Translator => {
         this.fallbackLocale = locale;
         return this;
     };
 
-    setFormatter = (formatter?: FormatterType): this => {
+    setFormatter = (formatter?: FormatterType): Translator => {
         if (formatter) {
             this.formatter = formatter;
         } else {
@@ -145,7 +158,7 @@ class Translator {
         return this;
     };
 
-    setTranslations = (translations: TranslationType): this => {
+    setTranslations = (translations: TranslationType): Translator => {
         Object.entries(translations).forEach(([locale, domains]) => {
             Object.entries(domains).forEach(([domain, messages]) => {
                 this.addCatalog(messages, domain, locale);
