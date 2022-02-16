@@ -2,9 +2,11 @@
 /.idea
 
 # Development
+/.github
 /lib
 !/lib/*.d.ts
 /test
 .babelrc.js
 tsconfig.json
 tslint.json
+webpack.config.js
