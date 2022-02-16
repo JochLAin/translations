@@ -1,5 +1,7 @@
 # Translation module
 
+![CI state](https://github.com/jochlain/translations/actions/workflows/ci.yml/badge.svg?branch=main&event=push)
+
 From a [catalog of translations](#types), translate your content with or not parameters.
 
 Can work with Symfony translations structure in Node environment and/or with Webpack using Babel.  
