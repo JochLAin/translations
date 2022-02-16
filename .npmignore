@@ -2,10 +2,9 @@
 /.idea
 
 # Development
-/test
-/lib/*.js.map
-/lib/*.ts
+/lib
 !/lib/*.d.ts
+/test
 .babelrc.js
 tsconfig.json
 tslint.json

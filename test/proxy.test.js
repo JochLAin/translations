@@ -1,4 +1,4 @@
-import Translator from '../lib';
+import Translator from '../index';
 
 test('Default export as method', () => {
     const translator = Translator({

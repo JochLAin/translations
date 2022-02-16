@@ -1,4 +1,4 @@
-import Translator, { translate } from '../lib';
+import Translator, { translate } from '../index';
 import CATALOG from './constant';
 
 test('Simple translations with domain parameter', () => {
