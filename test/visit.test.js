@@ -1,4 +1,4 @@
-const { getCatalogValue } = require("../lib");
+const { getCatalogValue } = require("../index");
 const CATALOG = require("./constant");
 
 test('Visit catalog method', () => {

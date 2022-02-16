@@ -1,2 +1,3 @@
-import { ReplacementType } from "./types";
-export default function format(message: string, replacements: ReplacementType, locale?: string): string;
+export default function format(message: string, replacements: {
+    [key: string]: number | string;
+}, locale?: string): string;

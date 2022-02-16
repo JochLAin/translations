@@ -1,6 +1,26 @@
 import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./constants";
 import format from "./format";
-import { CatalogType, FormatterType, OptionsType, ReplacementType, TranslationType } from "./types";
+export declare type FormatType = (message: string, replacements: ReplacementType, locale: string) => string;
+export declare type FormatterType = {
+    format: FormatType;
+};
+export declare type CatalogType = {
+    [key: string]: CatalogType | string;
+};
+export declare type DomainType = {
+    [domain: string]: CatalogType;
+};
+export declare type ReplacementType = {
+    [key: string]: any;
+};
+export declare type TranslationType = {
+    [locale: string]: DomainType;
+};
+export declare type OptionsType = {
+    locale?: string;
+    domain?: string;
+    formatter?: FormatterType;
+};
 declare class Translator {
     static create(translations?: TranslationType, options?: OptionsType): Translator;
     static getKey(domain: string, locale: string): string;
@@ -14,13 +34,13 @@ declare class Translator {
     formatter: FormatterType;
     translations: Map<string, CatalogType>;
     constructor(translations?: Map<string, CatalogType>);
-    addCatalog: (catalog?: CatalogType, domain?: string, locale?: string) => this;
+    addCatalog: (catalog?: CatalogType, domain?: string, locale?: string) => Translator;
     getCatalog: (domain?: string, locale?: string) => CatalogType | undefined;
     getMessage: (key: string, domain: string, locale: string) => string;
-    setFallbackDomain: (domain?: string) => this;
-    setFallbackLocale: (locale?: string) => this;
-    setFormatter: (formatter?: FormatterType | undefined) => this;
-    setTranslations: (translations: TranslationType) => this;
+    setFallbackDomain: (domain?: string) => Translator;
+    setFallbackLocale: (locale?: string) => Translator;
+    setFormatter: (formatter?: FormatterType | undefined) => Translator;
+    setTranslations: (translations: TranslationType) => Translator;
     translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
     withDomain: (domain: string) => Translator;
     withFormatter: (formatter: FormatterType) => Translator;
