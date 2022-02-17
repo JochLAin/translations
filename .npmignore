@@ -3,7 +3,7 @@
 
 # Development
 /.github
-/lib
+/lib/*.ts
 !/lib/*.d.ts
 /test
 .babelrc.js
