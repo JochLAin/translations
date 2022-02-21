@@ -23,24 +23,31 @@ export declare type OptionsType = {
 };
 declare class Translator {
     static create(translations?: TranslationType, options?: OptionsType): Translator;
+    static getMapKey(domain: string, locale: string): string;
     static getKey(domain: string, locale: string): string;
     static getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType;
+    static parseMapKey(key: string): [string, string];
     static translate(catalog?: {
         [locale: string]: string;
     }, replacements?: ReplacementType, locale?: string, formatter?: FormatterType): string;
+    catalogs: Map<string, CatalogType>;
     fallbackDomain: string;
     fallbackLocale: string;
     formatter: FormatterType;
-    translations: Map<string, CatalogType>;
-    constructor(translations?: Map<string, CatalogType>);
+    constructor(catalogs?: Map<string, CatalogType>);
     addCatalog: (catalog?: CatalogType, domain?: string, locale?: string) => Translator;
     getCatalog: (domain?: string, locale?: string) => CatalogType | undefined;
-    getMessage: (key: string, domain: string, locale: string) => string;
+    getDomains: () => string[];
+    getLocales: () => string[];
+    getMessage: (key: string, domain?: string, locale?: string) => string;
+    getMessages: (key: string, domain?: string) => {
+        [locale: string]: string;
+    };
     setFallbackDomain: (domain?: string) => Translator;
     setFallbackLocale: (locale?: string) => Translator;
     setFormatter: (formatter?: FormatterType | undefined) => Translator;
-    setTranslations: (translations: TranslationType) => Translator;
+    setTranslations: (catalogs: TranslationType) => Translator;
     translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
     withDomain: (domain: string) => Translator;
     withFormatter: (formatter: FormatterType) => Translator;

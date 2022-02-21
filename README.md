@@ -181,11 +181,11 @@ DEFAULT_LOCALE="en"
 | [DEFAULT_DOMAIN](#constants) | string                                 | Module constant                                                                       |
 | [DEFAULT_LOCALE](#constants) | string                                 | Module constant                                                                       |
 | Translator                   | Proxy<[Translator](#translator-class)> | The default export of the module                                                      |
-| createTranslator             | Function                               | Static method [create](#static-method-create)                                         |
+| createTranslator             | Function                               | Static method [create](#static-methods)                                               |
 | formatMessage                | Function                               | Default [format method](#default-format-method)                                       |
-| getCatalogValue              | Function                               | Static method [getCatalogValue](#static-method-getCatalogValue)                       |
-| mergeCatalogs                | Function                               | Static method [mergeCatalogs](#static-method-mergeCatalogs)                           |
-| translate                    | Function                               | Static method [translate](#static-method-translate)                                   |
+| getCatalogValue              | Function                               | Static method [getCatalogValue](#static-methods)                                      |
+| mergeCatalogs                | Function                               | Static method [mergeCatalogs](#static-methods)                                        |
+| translate                    | Function                               | Static method [translate](#static-methods)                                            |
 
 ### Translator class
 
@@ -193,48 +193,35 @@ DEFAULT_LOCALE="en"
 
 | Name           | Type                               | Default                                                      | Description                                  |
 |----------------|------------------------------------|--------------------------------------------------------------|----------------------------------------------|
+| catalogs       | Map<string, [CatalogType](#types)> | `[]`                                                         | Translation catalogs                         |
 | fallbackDomain | string                             | `'messages'`                                                 | Default domain used in `translate`           |
 | fallbackLocale | string                             | `'en'`                                                       | Default locale used in `translate`           |
 | formatter      | [FormatterType](#types)            | <code>{ <a href="#default-format-method">format</a> }</code> | Formate message with locale and replacements |
-| translations   | Map<string, [CatalogType](#types)> | `[]`                                                         | Translations catalog                         |
+| translations   | [TranslationType](#types)          | `{}`                                                         | Translation catalogs formatted as object     |
 
 #### Static methods
 
-<details id="static-method-create">
-    <summary><code>create(translations, options)</code></summary>
+<details>
+    <summary><code>create(catalogs, options)</code></summary>
     
-Create Translator instance with another translations catalog format and set fallback values.
+Create Translator instance with another catalogs format and set fallback values.
 
 ##### Parameters
 
-| Name         | Type                      | Default | Description                                 |
-|--------------|---------------------------|---------|---------------------------------------------|
-| translations | [TranslationType](#types) | `{}`    | Translation catalogs by locale and domains  |
-| options      | [OptionsType](#types)     | `{}`    | Options to set member default value         |
+| Name     | Type                      | Default | Description                                 |
+|----------|---------------------------|---------|---------------------------------------------|
+| catalogs | [TranslationType](#types) | `{}`    | Translation catalogs by locale and domains  |
+| options  | [OptionsType](#types)     | `{}`    | Options to set member default value         |
 
 ##### Return value
 
-An instance of Translator.
+| Type       | Description           |
+|------------|-----------------------|
+| Translator | A translator instance |
+
 </details>
 
-<details id="static-method-getKey">
-    <summary><code>getKey(domain, locale)</code></summary>
-
-Format a key from domain and locale.
-
-##### Parameters
-
-| Name   | Type   |
-|--------|--------|
-| domain | string |
-| locale | string |
-
-##### Return value
-
-A string representing the catalog key in translations map.
-</details>
-
-<details id="static-method-getCatalogValue">
+<details>
     <summary><code>getCatalogValue(catalog, key)</code></summary>
 
 Browse catalog to find value assigned to key
@@ -248,10 +235,33 @@ Browse catalog to find value assigned to key
 
 ##### Return value
 
-A string representing the key in catalog or the key if not found.
+| Type   | Description                                                          |
+|--------|----------------------------------------------------------------------|
+| string | The value in the catalog attached to the key or the key if not found |
+
 </details>
 
-<details id="static-method-mergeCatalogs">
+<details>
+    <summary><code>getKey(domain, locale)</code></summary>
+
+Format a key from domain and locale.
+
+##### Parameters
+
+| Name   | Type   |
+|--------|--------|
+| domain | string |
+| locale | string |
+
+##### Return value
+
+| Type   | Description       |
+|--------|-------------------|
+| string | The formatted key |
+
+</details>
+
+<details>
     <summary><code>mergeCatalogs(target, ...sources)</code></summary>
 
 Deep merge many catalogs
@@ -265,10 +275,32 @@ Deep merge many catalogs
 
 ##### Return value
 
-A [CatalogType](#types) with merged values.
+| Type                  | Description                       |
+|-----------------------|-----------------------------------|
+| [CatalogType](#types) | A catalog with deep merged values |
+
 </details>
 
-<details id="static-method-translate">
+<details>
+    <summary><code>parseKey(key)</code></summary>
+
+Get domain and locale from key.
+
+##### Parameters
+
+| Name | Type   |
+|------|--------|
+| key  | string |
+
+##### Return value
+
+| Type             | Description               |
+|------------------|---------------------------|
+| [string, string] | The domain and the locale |
+
+</details>
+
+<details>
     <summary><code>translate(catalog, replacements, locale, formatter)</code></summary>
 
 Translate a message from a simple catalog
@@ -284,12 +316,34 @@ Translate a message from a simple catalog
 
 ##### Return value
 
-A string representing the translated message.
+| Type   | Description            |
+|--------|------------------------|
+| string | The translated message |
+
+</details>
+
+#### Constructor
+
+<details>
+    <summary><code>constructor(catalogs)</code></summary>
+
+##### Parameters
+
+| Name     | Type                                           |
+|----------|------------------------------------------------|
+| catalogs | Map<string, [CatalogType](#types)> &#124; null |
+
+##### Return value
+
+| Type                                   |
+|----------------------------------------|
+| Proxy<[Translator](#translator-class)> |
+
 </details>
 
 #### Methods
 
-<details id="method-addCatalog">
+<details>
     <summary><code>addCatalog(catalog, domain, locale)</code></summary>
 
 Add a catalog to translations map
@@ -304,13 +358,16 @@ Add a catalog to translations map
 
 ##### Return value
 
-The Translator instance
+| Type       | Description                              |
+|------------|------------------------------------------|
+| Translator | The translator instance to chain methods |
+
 </details>
 
-<details id="method-getCatalog">
+<details>
     <summary><code>getCatalog(domain, locale)</code></summary>
 
-Get the catalog attach to domain and locale in translations map.  
+Get the catalog attached to domain and locale in catalogs map.  
 If `locale` is like `en_US` it looks first for a `en_US` catalog and if not looks for a `en` catalog.
 
 ##### Parameters
@@ -322,14 +379,43 @@ If `locale` is like `en_US` it looks first for a `en_US` catalog and if not look
 
 ##### Return value
 
-A [CatalogType](#types) or `undefined`
+| Type                                   | Description                                           |
+|----------------------------------------|-------------------------------------------------------|
+| [CatalogType](#types) &#124; undefined | The catalog of messages attached to domain and locale |
+
 </details>
 
-<details id="method-getMessage">
+<details>
+    <summary><code>getDomains()</code></summary>
+
+Get all domains fill in catalogs map
+
+##### Return value
+
+| Type     | Description |
+|----------|-------------|
+| string[] | The domains |
+
+</details>
+
+<details>
+    <summary><code>getLocales()</code></summary>
+
+Get all locales fill in catalogs map
+
+##### Return value
+
+| Type     | Description |
+|----------|-------------|
+| string[] | The locales |
+
+</details>
+
+<details>
     <summary><code>getMessage(key, domain, locale)</code></summary>
 
-Get message attach to key in catalog attach to domain and locale in translations.  
-See [getCatalog](#method-getCatalog) and [getCatalogValue](#static-method-getCatalogValue)
+Get message attached to key in catalog attached to domain and locale in catalogs.  
+See [getCatalog](#methods) and [getCatalogValue](#static-methods)
 
 ##### Parameters
 
@@ -341,10 +427,33 @@ See [getCatalog](#method-getCatalog) and [getCatalogValue](#static-method-getCat
 
 ##### Return value
 
-A string if found or key.
+| Type   | Description                                 |
+|--------|---------------------------------------------|
+| string | Message attached to key or key if not found |
+
 </details>
 
-<details id="method-setFallbackDomain">
+<details>
+    <summary><code>getMessages(key, domain)</code></summary>
+
+Get messages attached to key
+
+##### Parameters
+
+| Name   | Type   | Default                         |
+|--------|--------|---------------------------------|
+| key    | string | none                            |
+| domain | string | this.[fallbackDomain](#members) |
+
+##### Return value
+
+| Type                         | Description                        |
+|------------------------------|------------------------------------|
+| { [locale: string] :string } | A collection of messages by locale |
+
+</details>
+
+<details>
     <summary><code>setFallbackDomain(domain)</code></summary>
 
 Set the [fallbackDomain](#members) member
@@ -357,10 +466,13 @@ Set the [fallbackDomain](#members) member
 
 ##### Return value
 
-The Translator instance
+| Type       | Description                              |
+|------------|------------------------------------------|
+| Translator | The translator instance to chain methods |
+
 </details>
 
-<details id="method-setFallbackLocale">
+<details>
     <summary><code>setFallbackLocale(locale)</code></summary>
 
 Set the [fallbackLocale](#members) member
@@ -373,10 +485,13 @@ Set the [fallbackLocale](#members) member
 
 ##### Return value
 
-The Translator instance
+| Type       | Description                              |
+|------------|------------------------------------------|
+| Translator | The translator instance to chain methods |
+
 </details>
 
-<details id="method-setFormatter">
+<details>
     <summary><code>setFormatter(formatter)</code></summary>
 
 Set the [formatter](#members) member
@@ -389,26 +504,32 @@ Set the [formatter](#members) member
 
 ##### Return value
 
-The Translator instance
+| Type       | Description                              |
+|------------|------------------------------------------|
+| Translator | The translator instance to chain methods |
+
 </details>
 
-<details id="method-setTranslations">
+<details>
     <summary><code>setTranslations(translations)</code></summary>
 
 Set the [formatter](#members) member
 
 ##### Parameters
 
-| Name      | Type                    | Default                                                      |
-|-----------|-------------------------|--------------------------------------------------------------|
-| formatter | [FormatterType](#types) | <code>{ <a href="#default-format-method">format</a> }</code> |
+| Name         | Type                      | Default                    |
+|--------------|---------------------------|----------------------------|
+| translations | [TranslationType](#types) | The translations to append |
 
 ##### Return value
 
-The Translator instance
+| Type       | Description                              |
+|------------|------------------------------------------|
+| Translator | The translator instance to chain methods |
+
 </details>
 
-<details id="method-withDomain">
+<details>
     <summary><code>withDomain(domain)</code></summary>
 
 Clone instance with fallbackDomain domain parameter 
@@ -421,10 +542,13 @@ Clone instance with fallbackDomain domain parameter
 
 ##### Return value
 
-A new Translator instance
+| Type       | Description               |
+|------------|---------------------------|
+| Translator | A new translator instance |
+
 </details>
 
-<details id="method-withFormatter">
+<details>
     <summary><code>withFormatter(formatter)</code></summary>
 
 Clone instance with formatter
@@ -437,10 +561,13 @@ Clone instance with formatter
 
 ##### Return value
 
-A new Translator instance
+| Type       | Description               |
+|------------|---------------------------|
+| Translator | A new translator instance |
+
 </details>
 
-<details id="method-withLocale">
+<details>
     <summary><code>withLocale(locale)</code></summary>
 
 Clone instance with fallbackLocale locale parameter 
@@ -453,10 +580,13 @@ Clone instance with fallbackLocale locale parameter
 
 ##### Return value
 
-A new Translator instance
+| Type       | Description               |
+|------------|---------------------------|
+| Translator | A new translator instance |
+
 </details>
 
-<details id="method-with">
+<details>
     <summary><code>with({ domain, formatter, locale })</code></summary>
 
 Clone instance with domain, formatter, locale.
@@ -471,7 +601,10 @@ Clone instance with domain, formatter, locale.
 
 ##### Return value
 
-A new Translator instance
+| Type       | Description               |
+|------------|---------------------------|
+| Translator | A new translator instance |
+
 </details>
 
 ### Default format method

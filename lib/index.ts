@@ -15,6 +15,8 @@ export type OptionsType = {
     formatter?: FormatterType,
 };
 
+const KEY_SEPARATOR = '-';
+
 class Translator {
     static create(translations: TranslationType = {}, options: OptionsType = {}): Translator {
         const { domain = DEFAULT_DOMAIN, locale = DEFAULT_LOCALE, formatter } = options;
@@ -27,8 +29,13 @@ class Translator {
         ;
     }
 
+    static getMapKey(domain: string, locale: string): string {
+        return `${domain.toLowerCase()}${KEY_SEPARATOR}${locale.toLowerCase()}`;
+    }
+
+    /** @deprecated use getMapKey instead */
     static getKey(domain: string, locale: string): string {
-        return `${domain.toLowerCase()}-${locale.toLowerCase()}`;
+        return Translator.getMapKey(domain, locale);
     }
 
     static getCatalogValue = (catalog: CatalogType|undefined, key: string): string => {
@@ -68,6 +75,11 @@ class Translator {
         return Translator.mergeCatalogs(target, ...sources);
     };
 
+    static parseMapKey(key: string): [string, string] {
+        const [domain, locale] = key.split(KEY_SEPARATOR);
+        return [domain, locale];
+    }
+
     static translate(catalog: { [locale: string]: string } = {}, replacements: ReplacementType = {}, locale: string = DEFAULT_LOCALE, formatter: FormatterType = { format }): string {
         const message = catalog[locale] || catalog[locale.split('_')[0]] || '';
         if (!message) return ''
@@ -75,13 +87,13 @@ class Translator {
         return formatter.format(message, replacements, locale);
     }
 
+    catalogs: Map<string, CatalogType>;
     fallbackDomain: string = DEFAULT_DOMAIN;
     fallbackLocale: string = DEFAULT_LOCALE;
     formatter: FormatterType = { format };
-    translations: Map<string, CatalogType>;
 
-    constructor(translations?: Map<string, CatalogType>) {
-        this.translations = translations || new Map<string, CatalogType>();
+    constructor(catalogs?: Map<string, CatalogType>) {
+        this.catalogs = catalogs || new Map<string, CatalogType>();
 
         return new Proxy(this, {
             get(target: Translator, property: string | symbol, receiver: any): any {
@@ -90,8 +102,8 @@ class Translator {
                         return Reflect.get(target, `_${property}`, receiver);
                     }
                     if ('translations' === property) {
-                        return [...target.translations.entries()].reduce((accu: TranslationType, [key, catalog]) => {
-                            const [domain, locale] = key.split('-');
+                        return [...target.catalogs.entries()].reduce((accu: TranslationType, [key, catalog]) => {
+                            const [domain, locale] = Translator.parseMapKey(key);
                             if (!accu[locale]) accu[locale] = {};
                             accu[locale][domain] = catalog;
 
@@ -120,23 +132,43 @@ class Translator {
     }
 
     addCatalog = (catalog: CatalogType = {}, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): Translator => {
-        const key = Translator.getKey(domain, locale);
+        const key = Translator.getMapKey(domain, locale);
         const value = Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog);
-        this.translations.set(key, value);
+        this.catalogs.set(key, value);
 
         return this;
     };
 
     getCatalog = (domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): CatalogType|undefined => {
-        const catalog = this.translations.get(Translator.getKey(domain, locale));
+        const catalog = this.catalogs.get(Translator.getMapKey(domain, locale));
         if (catalog) return catalog;
         if (domain.includes('_')) {
-            return this.translations.get(Translator.getKey(domain, locale.split('_')[0]));
+            return this.catalogs.get(Translator.getMapKey(domain, locale.split('_')[0]));
         }
     };
 
-    getMessage = (key: string, domain: string, locale: string): string => {
+    getDomains = (): string[] => {
+        return [...this.catalogs.keys()]
+            .map((key: string) => Translator.parseMapKey(key)[0])
+            .filter((key, idx, keys) => keys.indexOf(key) === idx)
+        ;
+    };
+
+    getLocales = (): string[] => {
+        return [...this.catalogs.keys()]
+            .map((key: string) => Translator.parseMapKey(key)[1])
+            .filter((key, idx, keys) => keys.indexOf(key) === idx)
+        ;
+    };
+
+    getMessage = (key: string, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): string => {
         return Translator.getCatalogValue(this.getCatalog(domain, locale), key);
+    };
+
+    getMessages = (key: string, domain: string = this.fallbackDomain): { [locale: string]: string } => {
+        return this.getLocales().reduce((accu, locale) => {
+            return { ...accu, [locale]: this.getMessage(key, domain, locale) };
+        }, {});
     };
 
     setFallbackDomain = (domain: string = DEFAULT_DOMAIN): Translator => {
@@ -158,8 +190,8 @@ class Translator {
         return this;
     };
 
-    setTranslations = (translations: TranslationType): Translator => {
-        Object.entries(translations).forEach(([locale, domains]) => {
+    setTranslations = (catalogs: TranslationType): Translator => {
+        Object.entries(catalogs).forEach(([locale, domains]) => {
             Object.entries(domains).forEach(([domain, messages]) => {
                 this.addCatalog(messages, domain, locale);
             });
@@ -179,7 +211,7 @@ class Translator {
     };
 
     withDomain = (domain: string): Translator => {
-        return (new Translator(this.translations))
+        return (new Translator(this.catalogs))
             .setFallbackDomain(domain)
             .setFallbackLocale(this.fallbackLocale)
             .setFormatter(this.formatter)
@@ -187,7 +219,7 @@ class Translator {
     };
 
     withFormatter = (formatter: FormatterType): Translator => {
-        return (new Translator(this.translations))
+        return (new Translator(this.catalogs))
             .setFallbackDomain(this.fallbackDomain)
             .setFallbackLocale(this.fallbackLocale)
             .setFormatter(formatter)
@@ -195,7 +227,7 @@ class Translator {
     };
 
     withLocale = (locale: string): Translator => {
-        return (new Translator(this.translations))
+        return (new Translator(this.catalogs))
             .setFallbackDomain(this.fallbackDomain)
             .setFallbackLocale(locale)
             .setFormatter(this.formatter)
@@ -203,7 +235,7 @@ class Translator {
     };
 
     with = (options: OptionsType) => {
-        return (new Translator(this.translations))
+        return (new Translator(this.catalogs))
             .setFallbackDomain(options.domain || this.fallbackDomain)
             .setFallbackLocale(options.locale || this.fallbackLocale)
             .setFormatter(options.formatter || this.formatter)
