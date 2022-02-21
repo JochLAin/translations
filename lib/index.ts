@@ -87,105 +87,70 @@ class Translator {
         return formatter.format(message, replacements, locale);
     }
 
-    catalogs: Map<string, CatalogType>;
-    fallbackDomain: string = DEFAULT_DOMAIN;
-    fallbackLocale: string = DEFAULT_LOCALE;
-    formatter: FormatterType = { format };
+    _catalogs: Map<string, CatalogType>;
+    _fallbackDomain: string = DEFAULT_DOMAIN;
+    _fallbackLocale: string = DEFAULT_LOCALE;
+    _formatter: FormatterType = { format };
 
     constructor(catalogs?: Map<string, CatalogType>) {
-        this.catalogs = catalogs || new Map<string, CatalogType>();
-
-        return new Proxy(this, {
-            get(target: Translator, property: string | symbol, receiver: any): any {
-                if (typeof property === 'string') {
-                    if (['fallbackDomain', 'fallbackLocale', 'formatter'].includes(property)) {
-                        return Reflect.get(target, `_${property}`, receiver);
-                    }
-                    if ('translations' === property) {
-                        return [...target.catalogs.entries()].reduce((accu: TranslationType, [key, catalog]) => {
-                            const [domain, locale] = Translator.parseMapKey(key);
-                            if (!accu[locale]) accu[locale] = {};
-                            accu[locale][domain] = catalog;
-
-                            return accu;
-                        }, {});
-                    }
-                }
-                return Reflect.get(target, property, receiver);
-            },
-            set(target: Translator, property: string | symbol, value: any, receiver: any): boolean {
-                if (typeof property === 'string') {
-                    switch (property) {
-                        case 'fallbackDomain':
-                            return !!target.setFallbackDomain(value);
-                        case 'fallbackLocale':
-                            return !!target.setFallbackLocale(value);
-                        case 'formatter':
-                            return !!target.setFormatter(value);
-                        case 'translations':
-                            return !!target.setTranslations(value);
-                    }
-                }
-                return Reflect.set(target, property, receiver);
-            }
-        });
+        this._catalogs = catalogs || new Map<string, CatalogType>();
     }
 
-    addCatalog = (catalog: CatalogType = {}, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): Translator => {
+    addCatalog = (catalog: CatalogType = {}, domain: string = this._fallbackDomain, locale: string = this._fallbackLocale): Translator => {
         const key = Translator.getMapKey(domain, locale);
         const value = Translator.mergeCatalogs(this.getCatalog(domain, locale), catalog);
-        this.catalogs.set(key, value);
+        this._catalogs.set(key, value);
 
         return this;
     };
 
-    getCatalog = (domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): CatalogType|undefined => {
-        const catalog = this.catalogs.get(Translator.getMapKey(domain, locale));
+    getCatalog = (domain: string = this._fallbackDomain, locale: string = this._fallbackLocale): CatalogType|undefined => {
+        const catalog = this._catalogs.get(Translator.getMapKey(domain, locale));
         if (catalog) return catalog;
         if (domain.includes('_')) {
-            return this.catalogs.get(Translator.getMapKey(domain, locale.split('_')[0]));
+            return this._catalogs.get(Translator.getMapKey(domain, locale.split('_')[0]));
         }
     };
 
     getDomains = (): string[] => {
-        return [...this.catalogs.keys()]
+        return [...this._catalogs.keys()]
             .map((key: string) => Translator.parseMapKey(key)[0])
             .filter((key, idx, keys) => keys.indexOf(key) === idx)
         ;
     };
 
     getLocales = (): string[] => {
-        return [...this.catalogs.keys()]
+        return [...this._catalogs.keys()]
             .map((key: string) => Translator.parseMapKey(key)[1])
             .filter((key, idx, keys) => keys.indexOf(key) === idx)
         ;
     };
 
-    getMessage = (key: string, domain: string = this.fallbackDomain, locale: string = this.fallbackLocale): string => {
+    getMessage = (key: string, domain: string = this._fallbackDomain, locale: string = this._fallbackLocale): string => {
         return Translator.getCatalogValue(this.getCatalog(domain, locale), key);
     };
 
-    getMessages = (key: string, domain: string = this.fallbackDomain): { [locale: string]: string } => {
+    getMessages = (key: string, domain: string = this._fallbackDomain): { [locale: string]: string } => {
         return this.getLocales().reduce((accu, locale) => {
             return { ...accu, [locale]: this.getMessage(key, domain, locale) };
         }, {});
     };
 
     setFallbackDomain = (domain: string = DEFAULT_DOMAIN): Translator => {
-        this.fallbackDomain = domain;
+        this._fallbackDomain = domain;
         return this;
     };
 
     setFallbackLocale = (locale: string = DEFAULT_LOCALE): Translator => {
-        this.fallbackLocale = locale;
+        this._fallbackLocale = locale;
         return this;
     };
 
     setFormatter = (formatter?: FormatterType): Translator => {
         if (formatter) {
-            this.formatter = formatter;
+            this._formatter = formatter;
         } else {
-            this.formatter = { format };
+            this._formatter = { format };
         }
         return this;
     };
@@ -201,46 +166,92 @@ class Translator {
 
     translate = (key: string, replacements?: ReplacementType, domain?: string, locale?: string): string => {
         if (!replacements) replacements = {};
-        if (!domain) domain = this.fallbackDomain;
-        if (!locale) locale = this.fallbackLocale;
+        if (!domain) domain = this._fallbackDomain;
+        if (!locale) locale = this._fallbackLocale;
 
         const message = this.getMessage(key, domain, locale);
         if (!message) return key;
         if (!replacements) replacements = {};
-        return this.formatter.format(message, replacements, locale);
+        return this._formatter.format(message, replacements, locale);
     };
 
     withDomain = (domain: string): Translator => {
-        return (new Translator(this.catalogs))
+        return (new Translator(this._catalogs))
             .setFallbackDomain(domain)
-            .setFallbackLocale(this.fallbackLocale)
-            .setFormatter(this.formatter)
+            .setFallbackLocale(this._fallbackLocale)
+            .setFormatter(this._formatter)
         ;
     };
 
     withFormatter = (formatter: FormatterType): Translator => {
-        return (new Translator(this.catalogs))
-            .setFallbackDomain(this.fallbackDomain)
-            .setFallbackLocale(this.fallbackLocale)
+        return (new Translator(this._catalogs))
+            .setFallbackDomain(this._fallbackDomain)
+            .setFallbackLocale(this._fallbackLocale)
             .setFormatter(formatter)
         ;
     };
 
     withLocale = (locale: string): Translator => {
-        return (new Translator(this.catalogs))
-            .setFallbackDomain(this.fallbackDomain)
+        return (new Translator(this._catalogs))
+            .setFallbackDomain(this._fallbackDomain)
             .setFallbackLocale(locale)
-            .setFormatter(this.formatter)
+            .setFormatter(this._formatter)
         ;
     };
 
     with = (options: OptionsType) => {
-        return (new Translator(this.catalogs))
-            .setFallbackDomain(options.domain || this.fallbackDomain)
-            .setFallbackLocale(options.locale || this.fallbackLocale)
-            .setFormatter(options.formatter || this.formatter)
+        return (new Translator(this._catalogs))
+            .setFallbackDomain(options.domain || this._fallbackDomain)
+            .setFallbackLocale(options.locale || this._fallbackLocale)
+            .setFormatter(options.formatter || this._formatter)
         ;
     };
+
+    get catalogs(): Map<string, CatalogType> {
+        return this._catalogs;
+    }
+
+    set fallbackDomain(fallbackDomain: string) {
+        this.setFallbackDomain(fallbackDomain);
+    }
+
+    get fallbackDomain(): string {
+        return this._fallbackDomain;
+    }
+
+    get domain(): string {
+        return this.fallbackDomain;
+    }
+
+    set fallbackLocale(fallbackLocale: string) {
+        this.setFallbackLocale(fallbackLocale);
+    }
+
+    get fallbackLocale(): string {
+        return this._fallbackLocale;
+    }
+
+    get locale(): string {
+        return this.fallbackLocale;
+    }
+
+    set formatter(formatter: FormatterType) {
+        this.setFormatter(formatter);
+    }
+
+    get formatter(): FormatterType {
+        return this._formatter;
+    }
+
+    get translations(): TranslationType {
+        return [...this._catalogs.entries()].reduce((accu: TranslationType, [key, catalog]) => {
+            const [domain, locale] = Translator.parseMapKey(key);
+            if (!accu[locale]) accu[locale] = {};
+            accu[locale][domain] = catalog;
+
+            return accu;
+        }, {});
+    }
 }
 
 const proxy = new Proxy(Translator, {

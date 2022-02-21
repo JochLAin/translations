@@ -16,4 +16,5 @@ test('Getter translations', () => {
     });
 
     expect(translator.translations).not.toBeInstanceOf(Map);
+    expect(translator.translations).not.toBeUndefined();
 });
