@@ -31,14 +31,20 @@ declare class Translator {
     static translate(catalog?: {
         [locale: string]: string;
     }, replacements?: ReplacementType, locale?: string, formatter?: FormatterType): string;
-    catalogs: Map<string, CatalogType>;
-    fallbackDomain: string;
-    fallbackLocale: string;
-    formatter: FormatterType;
-    constructor(catalogs?: Map<string, CatalogType>);
+    _catalogs: Map<string, CatalogType>;
+    _fallbackDomain: string;
+    _fallbackLocale: string;
+    _formatter: FormatterType;
+    constructor(catalogs?: Map<string, CatalogType>, options?: OptionsType);
     addCatalog: (catalog?: CatalogType, domain?: string, locale?: string) => Translator;
     getCatalog: (domain?: string, locale?: string) => CatalogType | undefined;
+    getDomainCatalogs: (domain?: string) => {
+        [locale: string]: CatalogType;
+    };
     getDomains: () => string[];
+    getLocaleCatalogs: (locale?: string) => {
+        [domain: string]: CatalogType;
+    };
     getLocales: () => string[];
     getMessage: (key: string, domain?: string, locale?: string) => string;
     getMessages: (key: string, domain?: string) => {
@@ -53,6 +59,16 @@ declare class Translator {
     withFormatter: (formatter: FormatterType) => Translator;
     withLocale: (locale: string) => Translator;
     with: (options: OptionsType) => Translator;
+    get catalogs(): Map<string, CatalogType>;
+    set fallbackDomain(fallbackDomain: string);
+    get fallbackDomain(): string;
+    get domain(): string;
+    set fallbackLocale(fallbackLocale: string);
+    get fallbackLocale(): string;
+    get locale(): string;
+    set formatter(formatter: FormatterType);
+    get formatter(): FormatterType;
+    get translations(): TranslationType;
 }
 declare const proxy: typeof Translator;
 export default proxy;

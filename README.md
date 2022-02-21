@@ -175,17 +175,35 @@ DEFAULT_LOCALE="en"
 
 ### Module
 
-| Name                         | Type                                   | Description                                                                           |
-|------------------------------|----------------------------------------|---------------------------------------------------------------------------------------|
-| default                      | Proxy<[Translator](#translator-class)> | If call like a function it calls create static method, else is the Translation class. |
-| [DEFAULT_DOMAIN](#constants) | string                                 | Module constant                                                                       |
-| [DEFAULT_LOCALE](#constants) | string                                 | Module constant                                                                       |
-| Translator                   | Proxy<[Translator](#translator-class)> | The default export of the module                                                      |
-| createTranslator             | Function                               | Static method [create](#static-methods)                                               |
-| formatMessage                | Function                               | Default [format method](#default-format-method)                                       |
-| getCatalogValue              | Function                               | Static method [getCatalogValue](#static-methods)                                      |
-| mergeCatalogs                | Function                               | Static method [mergeCatalogs](#static-methods)                                        |
-| translate                    | Function                               | Static method [translate](#static-methods)                                            |
+| Name                         | Type                                      | Description                                                                           |
+|------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------|
+| default                      | [Proxy&lt;Translator>](#translator-class) | If call like a function it calls create static method, else is the Translation class. |
+| [DEFAULT_DOMAIN](#constants) | string                                    | Module constant                                                                       |
+| [DEFAULT_LOCALE](#constants) | string                                    | Module constant                                                                       |
+| Translator                   | [Proxy&lt;Translator>](#translator-class) | The default export of the module                                                      |
+| createTranslator             | Function                                  | Static method [create](#static-methods)                                               |
+| formatMessage                | Function                                  | Default [format method](#default-format-method)                                       |
+| getCatalogValue              | Function                                  | Static method [getCatalogValue](#static-methods)                                      |
+| mergeCatalogs                | Function                                  | Static method [mergeCatalogs](#static-methods)                                        |
+| translate                    | Function                                  | Static method [translate](#static-methods)                                            |
+
+### Translator proxy
+
+If is applied like below, it calls static method [create](#static-methods).
+If is constructed like below, is calls the [constructor](#constructor).
+
+```javascript
+import Translator from "@jochlain/translations";
+
+const domain = 'messages';
+const locale = 'en';
+const catalogs = new Map();
+catalogs.set('messages-en', { hello: 'Hello' });
+const translations = { en: { messages: { hello: 'Hello' } } };
+
+const translator_applied = Translator(translations, { domain, locale }); // call static method create.
+const translator_constructed = new Translator(catalogs, { domain, locale }); // construct new instance
+```
 
 ### Translator class
 
@@ -199,25 +217,45 @@ DEFAULT_LOCALE="en"
 | formatter      | [FormatterType](#types)            | <code>{ <a href="#default-format-method">format</a> }</code> | Formate message with locale and replacements |
 | translations   | [TranslationType](#types)          | `{}`                                                         | Translation catalogs formatted as object     |
 
+#### Constructor
+
+<details>
+    <summary><code>constructor(catalogs, options)</code></summary>
+
+##### Parameters
+
+| Name     | Type                               | Default   |
+|----------|------------------------------------|-----------|
+| catalogs | Map<string, [CatalogType](#types)> | Empty Map |
+| options  | [OptionsType](#types)              | `{}`      |
+
+##### Return value
+
+| Type                            |
+|---------------------------------|
+| [Translator](#translator-class) |
+
+</details>
+
 #### Static methods
 
 <details>
-    <summary><code>create(catalogs, options)</code></summary>
+    <summary><code>create(translations, options)</code></summary>
     
 Create Translator instance with another catalogs format and set fallback values.
 
 ##### Parameters
 
-| Name     | Type                      | Default | Description                                 |
-|----------|---------------------------|---------|---------------------------------------------|
-| catalogs | [TranslationType](#types) | `{}`    | Translation catalogs by locale and domains  |
-| options  | [OptionsType](#types)     | `{}`    | Options to set member default value         |
+| Name         | Type                      | Default | Description                                 |
+|--------------|---------------------------|---------|---------------------------------------------|
+| translations | [TranslationType](#types) | `{}`    | Translation catalogs by locale and domains  |
+| options      | [OptionsType](#types)     | `{}`    | Options to set member default value         |
 
 ##### Return value
 
-| Type       | Description           |
-|------------|-----------------------|
-| Translator | A translator instance |
+| Type                            | Description           |
+|---------------------------------|-----------------------|
+| [Translator](#translator-class) | A translator instance |
 
 </details>
 
@@ -322,25 +360,6 @@ Translate a message from a simple catalog
 
 </details>
 
-#### Constructor
-
-<details>
-    <summary><code>constructor(catalogs)</code></summary>
-
-##### Parameters
-
-| Name     | Type                                           |
-|----------|------------------------------------------------|
-| catalogs | Map<string, [CatalogType](#types)> &#124; null |
-
-##### Return value
-
-| Type                                   |
-|----------------------------------------|
-| Proxy<[Translator](#translator-class)> |
-
-</details>
-
 #### Methods
 
 <details>
@@ -358,9 +377,9 @@ Add a catalog to translations map
 
 ##### Return value
 
-| Type       | Description                              |
-|------------|------------------------------------------|
-| Translator | The translator instance to chain methods |
+| Type                            | Description                              |
+|---------------------------------|------------------------------------------|
+| [Translator](#translator-class) | The translator instance to chain methods |
 
 </details>
 
@@ -466,9 +485,9 @@ Set the [fallbackDomain](#members) member
 
 ##### Return value
 
-| Type       | Description                              |
-|------------|------------------------------------------|
-| Translator | The translator instance to chain methods |
+| Type                            | Description                              |
+|---------------------------------|------------------------------------------|
+| [Translator](#translator-class) | The translator instance to chain methods |
 
 </details>
 
@@ -485,9 +504,9 @@ Set the [fallbackLocale](#members) member
 
 ##### Return value
 
-| Type       | Description                              |
-|------------|------------------------------------------|
-| Translator | The translator instance to chain methods |
+| Type                            | Description                              |
+|---------------------------------|------------------------------------------|
+| [Translator](#translator-class) | The translator instance to chain methods |
 
 </details>
 
@@ -504,9 +523,9 @@ Set the [formatter](#members) member
 
 ##### Return value
 
-| Type       | Description                              |
-|------------|------------------------------------------|
-| Translator | The translator instance to chain methods |
+| Type                            | Description                              |
+|---------------------------------|------------------------------------------|
+| [Translator](#translator-class) | The translator instance to chain methods |
 
 </details>
 
@@ -523,9 +542,9 @@ Set the [formatter](#members) member
 
 ##### Return value
 
-| Type       | Description                              |
-|------------|------------------------------------------|
-| Translator | The translator instance to chain methods |
+| Type                            | Description                              |
+|---------------------------------|------------------------------------------|
+| [Translator](#translator-class) | The translator instance to chain methods |
 
 </details>
 
@@ -542,9 +561,9 @@ Clone instance with fallbackDomain domain parameter
 
 ##### Return value
 
-| Type       | Description               |
-|------------|---------------------------|
-| Translator | A new translator instance |
+| Type                            | Description               |
+|---------------------------------|---------------------------|
+| [Translator](#translator-class) | A new translator instance |
 
 </details>
 
@@ -561,9 +580,9 @@ Clone instance with formatter
 
 ##### Return value
 
-| Type       | Description               |
-|------------|---------------------------|
-| Translator | A new translator instance |
+| Type                            | Description               |
+|---------------------------------|---------------------------|
+| [Translator](#translator-class) | A new translator instance |
 
 </details>
 
@@ -580,9 +599,9 @@ Clone instance with fallbackLocale locale parameter
 
 ##### Return value
 
-| Type       | Description               |
-|------------|---------------------------|
-| Translator | A new translator instance |
+| Type                            | Description               |
+|---------------------------------|---------------------------|
+| [Translator](#translator-class) | A new translator instance |
 
 </details>
 
@@ -601,9 +620,9 @@ Clone instance with domain, formatter, locale.
 
 ##### Return value
 
-| Type       | Description               |
-|------------|---------------------------|
-| Translator | A new translator instance |
+| Type                            | Description               |
+|---------------------------------|---------------------------|
+| [Translator](#translator-class) | A new translator instance |
 
 </details>
 

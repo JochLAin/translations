@@ -92,8 +92,15 @@ class Translator {
     _fallbackLocale: string = DEFAULT_LOCALE;
     _formatter: FormatterType = { format };
 
-    constructor(catalogs?: Map<string, CatalogType>) {
+    constructor(catalogs?: Map<string, CatalogType>, options: OptionsType = {}) {
+        const { domain = DEFAULT_DOMAIN, locale = DEFAULT_LOCALE, formatter } = options;
+
         this._catalogs = catalogs || new Map<string, CatalogType>();
+        this
+            .setFallbackDomain(domain)
+            .setFallbackLocale(locale)
+            .setFormatter(formatter)
+        ;
     }
 
     addCatalog = (catalog: CatalogType = {}, domain: string = this._fallbackDomain, locale: string = this._fallbackLocale): Translator => {
@@ -112,11 +119,23 @@ class Translator {
         }
     };
 
+    getDomainCatalogs = (domain: string = this._fallbackDomain): { [locale: string]: CatalogType } => {
+        return this.getLocales().reduce((accu, locale) => {
+            return { ...accu, [locale]: this.getCatalog(domain, locale) };
+        }, {});
+    };
+
     getDomains = (): string[] => {
         return [...this._catalogs.keys()]
             .map((key: string) => Translator.parseMapKey(key)[0])
             .filter((key, idx, keys) => keys.indexOf(key) === idx)
         ;
+    };
+
+    getLocaleCatalogs = (locale: string = this._fallbackLocale): { [domain: string]: CatalogType } => {
+        return this.getDomains().reduce((accu, domain) => {
+            return { ...accu, [domain]: this.getCatalog(domain, locale) };
+        }, {});
     };
 
     getLocales = (): string[] => {
