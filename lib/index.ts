@@ -287,7 +287,7 @@ const proxy = new Proxy(Translator, {
 
 export default proxy;
 export { DEFAULT_DOMAIN, DEFAULT_LOCALE };
-export { proxy as Translator }
+export { proxy as Translator };
 export const createTranslator = Translator.create;
 export const formatMessage = format;
 export const getCatalogValue = Translator.getCatalogValue;
