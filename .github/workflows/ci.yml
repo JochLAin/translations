@@ -2,9 +2,9 @@ name: CI Run test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
   workflow_dispatch:
 
 jobs:
@@ -20,4 +20,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm test
+      - run: cd packages/translations && npm test
+      - run: cd packages/translations-json && npm test
+      - run: cd packages/translations-yaml && npm test
