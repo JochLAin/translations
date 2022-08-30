@@ -1,4 +1,4 @@
-import Translator, { translate } from '../index';
+import Translator, { translate } from '../index.min.js';
 import CATALOG from './constant';
 
 test('Simple translations with domain parameter', () => {

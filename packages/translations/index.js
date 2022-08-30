@@ -1,1 +1,341 @@
-!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define("@jochlain/translations",[],e):"object"==typeof exports?exports["@jochlain/translations"]=e():t["@jochlain/translations"]=e()}(this,(function(){return(()=>{"use strict";var t={d:(e,a)=>{for(var r in a)t.o(a,r)&&!t.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:a[r]})},o:(t,e)=>Object.prototype.hasOwnProperty.call(t,e),r:t=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})}},e={};t.r(e),t.d(e,{DEFAULT_DOMAIN:()=>a,DEFAULT_LOCALE:()=>r,Translator:()=>d,create:()=>L,createTranslator:()=>_,default:()=>k,formatMessage:()=>O,getCatalogValue:()=>w,merge:()=>F,mergeCatalogs:()=>j,translate:()=>D,visitCatalog:()=>C});var a="messages",r="en";function n(t,e){for(var a=t,r=Object.keys(e),n=0;n<r.length;n++)a=a.replace(new RegExp("".concat(r[n]),"g"),String(e[r[n]]));return a}function o(t,e,a){return o=l()?Reflect.construct:function(t,e,a){var r=[null];r.push.apply(r,e);var n=new(Function.bind.apply(t,r));return a&&i(n,a.prototype),n},o.apply(null,arguments)}function l(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Boolean.prototype.valueOf.call(Reflect.construct(Boolean,[],(function(){}))),!0}catch(t){return!1}}function i(t,e){return i=Object.setPrototypeOf||function(t,e){return t.__proto__=e,t},i(t,e)}function c(t){return c="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},c(t)}function u(t,e){return function(t){if(Array.isArray(t))return t}(t)||function(t,e){var a=null==t?null:"undefined"!=typeof Symbol&&t[Symbol.iterator]||t["@@iterator"];if(null==a)return;var r,n,o=[],l=!0,i=!1;try{for(a=a.call(t);!(l=(r=a.next()).done)&&(o.push(r.value),!e||o.length!==e);l=!0);}catch(t){i=!0,n=t}finally{try{l||null==a.return||a.return()}finally{if(i)throw n}}return o}(t,e)||s(t,e)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function f(t){return function(t){if(Array.isArray(t))return g(t)}(t)||function(t){if("undefined"!=typeof Symbol&&null!=t[Symbol.iterator]||null!=t["@@iterator"])return Array.from(t)}(t)||s(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function s(t,e){if(t){if("string"==typeof t)return g(t,e);var a=Object.prototype.toString.call(t).slice(8,-1);return"Object"===a&&t.constructor&&(a=t.constructor.name),"Map"===a||"Set"===a?Array.from(t):"Arguments"===a||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(a)?g(t,e):void 0}}function g(t,e){(null==e||e>t.length)&&(e=t.length);for(var a=0,r=new Array(e);a<e;a++)r[a]=t[a];return r}function y(t,e){var a=Object.keys(t);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(t);e&&(r=r.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),a.push.apply(a,r)}return a}function p(t){for(var e=1;e<arguments.length;e++){var a=null!=arguments[e]?arguments[e]:{};e%2?y(Object(a),!0).forEach((function(e){h(t,e,a[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(a)):y(Object(a)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(a,e))}))}return t}function b(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function m(t,e){for(var a=0;a<e.length;a++){var r=e[a];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(t,r.key,r)}}function h(t,e,a){return e in t?Object.defineProperty(t,e,{value:a,enumerable:!0,configurable:!0,writable:!0}):t[e]=a,t}var v=function(){function t(e){var o=this,l=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};b(this,t),h(this,"_fallbackDomain",a),h(this,"_fallbackLocale",r),h(this,"_formatter",{format:n}),h(this,"addCatalog",(function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},a=arguments.length>1&&void 0!==arguments[1]?arguments[1]:o._fallbackDomain,r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:o._fallbackLocale,n=t.getMapKey(a,r),l=t.mergeCatalogs(o.getCatalog(a,r),e);return o._catalogs.set(n,l),o})),h(this,"getCatalog",(function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:o._fallbackDomain,a=arguments.length>1&&void 0!==arguments[1]?arguments[1]:o._fallbackLocale,r=o._catalogs.get(t.getMapKey(e,a));return r||(e.includes("_")?o._catalogs.get(t.getMapKey(e,a.split("_")[0])):void 0)})),h(this,"getDomainCatalogs",(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:o._fallbackDomain;return o.getLocales().reduce((function(e,a){return p(p({},e),{},h({},a,o.getCatalog(t,a)))}),{})})),h(this,"getDomains",(function(){return f(o._catalogs.keys()).map((function(e){return t.parseMapKey(e)[0]})).filter((function(t,e,a){return a.indexOf(t)===e}))})),h(this,"getLocaleCatalogs",(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:o._fallbackLocale;return o.getDomains().reduce((function(e,a){return p(p({},e),{},h({},a,o.getCatalog(a,t)))}),{})})),h(this,"getLocales",(function(){return f(o._catalogs.keys()).map((function(e){return t.parseMapKey(e)[1]})).filter((function(t,e,a){return a.indexOf(t)===e}))})),h(this,"getMessage",(function(e){var a=arguments.length>1&&void 0!==arguments[1]?arguments[1]:o._fallbackDomain,r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:o._fallbackLocale;return t.getCatalogValue(o.getCatalog(a,r),e)})),h(this,"getMessages",(function(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:o._fallbackDomain;return o.getLocales().reduce((function(a,r){return p(p({},a),{},h({},r,o.getMessage(t,e,r)))}),{})})),h(this,"setFallbackDomain",(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:a;return o._fallbackDomain=t,o})),h(this,"setFallbackLocale",(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:r;return o._fallbackLocale=t,o})),h(this,"setFormatter",(function(t){return o._formatter=t||{format:n},o})),h(this,"setTranslations",(function(t){return Object.entries(t).forEach((function(t){var e=u(t,2),a=e[0],r=e[1];Object.entries(r).forEach((function(t){var e=u(t,2),r=e[0],n=e[1];o.addCatalog(n,r,a)}))})),o})),h(this,"translate",(function(t,e,a,r){e||(e={}),a||(a=o._fallbackDomain),r||(r=o._fallbackLocale);var n=o.getMessage(t,a,r);return n?(e||(e={}),o._formatter.format(n,e,r)):t})),h(this,"withDomain",(function(e){return new t(o._catalogs).setFallbackDomain(e).setFallbackLocale(o._fallbackLocale).setFormatter(o._formatter)})),h(this,"withFormatter",(function(e){return new t(o._catalogs).setFallbackDomain(o._fallbackDomain).setFallbackLocale(o._fallbackLocale).setFormatter(e)})),h(this,"withLocale",(function(e){return new t(o._catalogs).setFallbackDomain(o._fallbackDomain).setFallbackLocale(e).setFormatter(o._formatter)})),h(this,"with",(function(e){return new t(o._catalogs).setFallbackDomain(e.domain||o._fallbackDomain).setFallbackLocale(e.locale||o._fallbackLocale).setFormatter(e.formatter||o._formatter)}));var i=l.domain,c=void 0===i?a:i,s=l.locale,g=void 0===s?r:s,y=l.formatter;this._catalogs=e||new Map,this.setFallbackDomain(c).setFallbackLocale(g).setFormatter(y)}var e,o,l;return e=t,l=[{key:"create",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},o=n.domain,l=void 0===o?a:o,i=n.locale,c=void 0===i?r:i,u=n.formatter;return(new t).setFallbackDomain(l).setFallbackLocale(c).setFormatter(u).setTranslations(e)}},{key:"getMapKey",value:function(t,e){return"".concat(t.toLowerCase()).concat("-").concat(e.toLowerCase())}},{key:"getKey",value:function(e,a){return t.getMapKey(e,a)}},{key:"mergeCatalogs",value:function(e){e||(e={});for(var a=arguments.length,r=new Array(a>1?a-1:0),n=1;n<a;n++)r[n-1]=arguments[n];if(!r.length)return e;var o=r.shift();if("object"===c(o))for(var l=Object.keys(o),i=0;i<l.length;i++){var u=l[i];"string"==typeof o[u]?Object.assign(e,h({},u,o[u])):(e[u]||(e[u]={}),"string"==typeof e[u]&&(e[u]={}),Object.assign(e[u],t.mergeCatalogs(e[u],o[u])))}return t.mergeCatalogs.apply(t,[e].concat(r))}},{key:"parseMapKey",value:function(t){var e=u(t.split("-"),2);return[e[0],e[1]]}},{key:"translate",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},a=arguments.length>2&&void 0!==arguments[2]?arguments[2]:r,o=arguments.length>3&&void 0!==arguments[3]?arguments[3]:{format:n},l=t[a]||t[a.split("_")[0]]||"";return l?(e||(e={}),o.format(l,e,a)):""}}],(o=[{key:"catalogs",get:function(){return this._catalogs}},{key:"fallbackDomain",get:function(){return this._fallbackDomain},set:function(t){this.setFallbackDomain(t)}},{key:"domain",get:function(){return this.fallbackDomain}},{key:"fallbackLocale",get:function(){return this._fallbackLocale},set:function(t){this.setFallbackLocale(t)}},{key:"locale",get:function(){return this.fallbackLocale}},{key:"formatter",get:function(){return this._formatter},set:function(t){this.setFormatter(t)}},{key:"translations",get:function(){return f(this._catalogs.entries()).reduce((function(e,a){var r=u(a,2),n=r[0],o=r[1],l=u(t.parseMapKey(n),2),i=l[0],c=l[1];return e[c]||(e[c]={}),e[c][i]=o,e}),{})}}])&&m(e.prototype,o),l&&m(e,l),Object.defineProperty(e,"prototype",{writable:!1}),t}();h(v,"getCatalogValue",(function(t,e){return function t(a){if(!a)return e;if("string"==typeof a)return a;for(var r="",n=arguments.length,o=new Array(n>1?n-1:0),l=1;l<n;l++)o[l-1]=arguments[l];for(;o.length;){var i=o.shift()||"";r?r+=".".concat(i):r=i;var c=a[r];if(c)return t.apply(void 0,[a[r]].concat(o))}return e}.apply(void 0,[t].concat(f(e.split("."))))}));var d=new Proxy(v,{apply:function(t,e,a){return v.create.apply(v,f(a))},construct:function(t,e){return o(v,f(e))},set:function(){throw new Error("It's not allowed to add a property to Translator class, please use a composition relation instead.")}});const k=d;var _=v.create,O=n,w=v.getCatalogValue,j=v.mergeCatalogs,D=v.translate,L=v.create,F=v.mergeCatalogs,C=v.getCatalogValue;return e})()}));
+"use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.translate = exports.mergeCatalogs = exports.getCatalogValue = exports.formatMessage = exports.createTranslator = exports.Translator = exports.format = exports.DEFAULT_LOCALE = exports.DEFAULT_DOMAIN = void 0;
+exports.DEFAULT_DOMAIN = 'messages';
+exports.DEFAULT_LOCALE = 'en';
+function format(message, replacements, locale) {
+    if (locale === void 0) { locale = exports.DEFAULT_LOCALE; }
+    var result = message;
+    for (var keys = Object.keys(replacements), idx = 0; idx < keys.length; idx++) {
+        result = result.replace(new RegExp("".concat(keys[idx]), 'g'), String(replacements[keys[idx]]));
+    }
+    return result;
+}
+exports.format = format;
+var KEY_SEPARATOR = '-';
+var Translator = (function () {
+    function Translator(catalogs, options) {
+        if (options === void 0) { options = {}; }
+        var _this = this;
+        this._fallbackDomain = exports.DEFAULT_DOMAIN;
+        this._fallbackLocale = exports.DEFAULT_LOCALE;
+        this._formatter = { format: format };
+        this.addCatalog = function (catalog, domain, locale) {
+            if (catalog === void 0) { catalog = {}; }
+            if (domain === void 0) { domain = _this._fallbackDomain; }
+            if (locale === void 0) { locale = _this._fallbackLocale; }
+            var key = Translator.getMapKey(domain, locale);
+            var value = Translator.mergeCatalogs(_this.getCatalog(domain, locale), catalog);
+            _this._catalogs.set(key, value);
+            return _this;
+        };
+        this.getCatalog = function (domain, locale) {
+            if (domain === void 0) { domain = _this._fallbackDomain; }
+            if (locale === void 0) { locale = _this._fallbackLocale; }
+            var catalog = _this._catalogs.get(Translator.getMapKey(domain, locale));
+            if (catalog)
+                return catalog;
+            if (domain.includes('_')) {
+                return _this._catalogs.get(Translator.getMapKey(domain, locale.split('_')[0]));
+            }
+            return undefined;
+        };
+        this.getDomainCatalogs = function (domain) {
+            if (domain === void 0) { domain = _this._fallbackDomain; }
+            return _this.getLocales().reduce(function (accu, locale) {
+                var _a;
+                return __assign(__assign({}, accu), (_a = {}, _a[locale] = _this.getCatalog(domain, locale), _a));
+            }, {});
+        };
+        this.getDomains = function () {
+            return Array.from(_this._catalogs.keys())
+                .map(function (key) { return Translator.parseMapKey(key)[0]; })
+                .filter(function (key, idx, keys) { return keys.indexOf(key) === idx; });
+        };
+        this.getLocaleCatalogs = function (locale) {
+            if (locale === void 0) { locale = _this._fallbackLocale; }
+            return _this.getDomains().reduce(function (accu, domain) {
+                var _a;
+                return __assign(__assign({}, accu), (_a = {}, _a[domain] = _this.getCatalog(domain, locale), _a));
+            }, {});
+        };
+        this.getLocales = function () {
+            return Array.from(_this._catalogs.keys())
+                .map(function (key) { return Translator.parseMapKey(key)[1]; })
+                .filter(function (key, idx, keys) { return keys.indexOf(key) === idx; });
+        };
+        this.getMessage = function (key, domain, locale) {
+            if (domain === void 0) { domain = _this._fallbackDomain; }
+            if (locale === void 0) { locale = _this._fallbackLocale; }
+            return Translator.getCatalogValue(_this.getCatalog(domain, locale), key);
+        };
+        this.getMessages = function (key, domain) {
+            if (domain === void 0) { domain = _this._fallbackDomain; }
+            return _this.getLocales().reduce(function (accu, locale) {
+                var _a;
+                return __assign(__assign({}, accu), (_a = {}, _a[locale] = _this.getMessage(key, domain, locale), _a));
+            }, {});
+        };
+        this.setFallbackDomain = function (domain) {
+            if (domain === void 0) { domain = exports.DEFAULT_DOMAIN; }
+            _this._fallbackDomain = domain;
+            return _this;
+        };
+        this.setFallbackLocale = function (locale) {
+            if (locale === void 0) { locale = exports.DEFAULT_LOCALE; }
+            _this._fallbackLocale = locale;
+            return _this;
+        };
+        this.setFormatter = function (formatter) {
+            if (formatter) {
+                _this._formatter = formatter;
+            }
+            else {
+                _this._formatter = { format: format };
+            }
+            return _this;
+        };
+        this.setTranslations = function (catalogs) {
+            Object.entries(catalogs).forEach(function (_a) {
+                var locale = _a[0], domains = _a[1];
+                Object.entries(domains).forEach(function (_a) {
+                    var domain = _a[0], messages = _a[1];
+                    _this.addCatalog(messages, domain, locale);
+                });
+            });
+            return _this;
+        };
+        this.translate = function (key, replacements, domain, locale) {
+            if (!replacements)
+                replacements = {};
+            if (!domain)
+                domain = _this._fallbackDomain;
+            if (!locale)
+                locale = _this._fallbackLocale;
+            var message = _this.getMessage(key, domain, locale);
+            if (!message)
+                return key;
+            if (!replacements)
+                replacements = {};
+            return _this._formatter.format(message, replacements, locale);
+        };
+        this.withDomain = function (domain) {
+            return (new Translator(_this._catalogs))
+                .setFallbackDomain(domain)
+                .setFallbackLocale(_this._fallbackLocale)
+                .setFormatter(_this._formatter);
+        };
+        this.withFormatter = function (formatter) {
+            return (new Translator(_this._catalogs))
+                .setFallbackDomain(_this._fallbackDomain)
+                .setFallbackLocale(_this._fallbackLocale)
+                .setFormatter(formatter);
+        };
+        this.withLocale = function (locale) {
+            return (new Translator(_this._catalogs))
+                .setFallbackDomain(_this._fallbackDomain)
+                .setFallbackLocale(locale)
+                .setFormatter(_this._formatter);
+        };
+        this.with = function (options) {
+            return (new Translator(_this._catalogs))
+                .setFallbackDomain(options.domain || _this._fallbackDomain)
+                .setFallbackLocale(options.locale || _this._fallbackLocale)
+                .setFormatter(options.formatter || _this._formatter);
+        };
+        var _a = options.domain, domain = _a === void 0 ? exports.DEFAULT_DOMAIN : _a, _b = options.locale, locale = _b === void 0 ? exports.DEFAULT_LOCALE : _b, formatter = options.formatter;
+        this._catalogs = catalogs || new Map();
+        this
+            .setFallbackDomain(domain)
+            .setFallbackLocale(locale)
+            .setFormatter(formatter);
+    }
+    Translator.create = function (translations, options) {
+        if (translations === void 0) { translations = {}; }
+        if (options === void 0) { options = {}; }
+        var _a = options.domain, domain = _a === void 0 ? exports.DEFAULT_DOMAIN : _a, _b = options.locale, locale = _b === void 0 ? exports.DEFAULT_LOCALE : _b, formatter = options.formatter;
+        return (new Translator())
+            .setFallbackDomain(domain)
+            .setFallbackLocale(locale)
+            .setFormatter(formatter)
+            .setTranslations(translations);
+    };
+    Translator.getMapKey = function (domain, locale) {
+        return "".concat(domain.toLowerCase()).concat(KEY_SEPARATOR).concat(locale.toLowerCase());
+    };
+    Translator.mergeCatalogs = function (target) {
+        var _a;
+        var sources = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            sources[_i - 1] = arguments[_i];
+        }
+        if (!target)
+            target = {};
+        if (!sources.length)
+            return target;
+        var source = sources.shift();
+        if (typeof source === 'object') {
+            for (var keys = Object.keys(source), idx = 0; idx < keys.length; idx++) {
+                var key = keys[idx];
+                if (typeof source[key] === 'string') {
+                    Object.assign(target, (_a = {}, _a[key] = source[key], _a));
+                }
+                else {
+                    if (!target[key])
+                        target[key] = {};
+                    if (typeof target[key] === 'string')
+                        target[key] = {};
+                    Object.assign(target[key], Translator.mergeCatalogs(target[key], source[key]));
+                }
+            }
+        }
+        return Translator.mergeCatalogs.apply(Translator, __spreadArray([target], sources, false));
+    };
+    ;
+    Translator.parseMapKey = function (key) {
+        var _a = key.split(KEY_SEPARATOR), domain = _a[0], locale = _a[1];
+        return [domain, locale];
+    };
+    Translator.translate = function (catalog, replacements, locale, formatter) {
+        if (catalog === void 0) { catalog = {}; }
+        if (replacements === void 0) { replacements = {}; }
+        if (locale === void 0) { locale = exports.DEFAULT_LOCALE; }
+        if (formatter === void 0) { formatter = { format: format }; }
+        var message = catalog[locale] || catalog[locale.split('_')[0]] || '';
+        if (!message)
+            return '';
+        if (!replacements)
+            replacements = {};
+        return formatter.format(message, replacements, locale);
+    };
+    Object.defineProperty(Translator.prototype, "catalogs", {
+        get: function () {
+            return this._catalogs;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "fallbackDomain", {
+        get: function () {
+            return this._fallbackDomain;
+        },
+        set: function (fallbackDomain) {
+            this.setFallbackDomain(fallbackDomain);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "domain", {
+        get: function () {
+            return this.fallbackDomain;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "fallbackLocale", {
+        get: function () {
+            return this._fallbackLocale;
+        },
+        set: function (fallbackLocale) {
+            this.setFallbackLocale(fallbackLocale);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "locale", {
+        get: function () {
+            return this.fallbackLocale;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "formatter", {
+        get: function () {
+            return this._formatter;
+        },
+        set: function (formatter) {
+            this.setFormatter(formatter);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Translator.prototype, "translations", {
+        get: function () {
+            return Array.from(this._catalogs.entries()).reduce(function (accu, _a) {
+                var key = _a[0], catalog = _a[1];
+                var _b = Translator.parseMapKey(key), domain = _b[0], locale = _b[1];
+                if (!accu[locale])
+                    accu[locale] = {};
+                accu[locale][domain] = catalog;
+                return accu;
+            }, {});
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Translator.getCatalogValue = function (catalog, key) {
+        var closure = function (catalog) {
+            var keys = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                keys[_i - 1] = arguments[_i];
+            }
+            if (!catalog)
+                return key;
+            if (typeof catalog === 'string')
+                return catalog;
+            var currentKey = '';
+            while (keys.length) {
+                var shifted = keys.shift() || '';
+                if (!currentKey)
+                    currentKey = shifted;
+                else
+                    currentKey += ".".concat(shifted);
+                var value = catalog[currentKey];
+                if (value)
+                    return closure.apply(void 0, __spreadArray([catalog[currentKey]], keys, false));
+            }
+            return key;
+        };
+        return closure.apply(void 0, __spreadArray([catalog], key.split('.'), false));
+    };
+    return Translator;
+}());
+var proxy = new Proxy(Translator, {
+    apply: function (target, thisArg, args) {
+        return Translator.create.apply(Translator, args);
+    },
+    construct: function (target, args) {
+        return new (Translator.bind.apply(Translator, __spreadArray([void 0], args, false)))();
+    },
+    set: function () {
+        throw new Error('It\'s not allowed to add a property to Translator class, please use a composition relation instead.');
+    }
+});
+exports.Translator = proxy;
+exports.default = proxy;
+exports.createTranslator = Translator.create;
+exports.formatMessage = format;
+exports.getCatalogValue = Translator.getCatalogValue;
+exports.mergeCatalogs = Translator.mergeCatalogs;
+exports.translate = Translator.translate;
+//# sourceMappingURL=index.js.map

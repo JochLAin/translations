@@ -1,4 +1,4 @@
-import Translator from '../index';
+import Translator from '../index.min.js';
 
 test('Getter catalogs', () => {
     const translator = Translator({

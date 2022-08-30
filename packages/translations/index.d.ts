@@ -1,5 +1,3 @@
-import { DEFAULT_DOMAIN, DEFAULT_LOCALE } from "./constants";
-import format from "./format";
 export declare type FormatType = (message: string, replacements: ReplacementType, locale: string) => string;
 export declare type FormatterType = {
     format: FormatType;
@@ -21,10 +19,14 @@ export declare type OptionsType = {
     domain?: string;
     formatter?: FormatterType;
 };
+export declare const DEFAULT_DOMAIN = "messages";
+export declare const DEFAULT_LOCALE = "en";
+export declare function format(message: string, replacements: {
+    [key: string]: number | string;
+}, locale?: string): string;
 declare class Translator {
     static create(translations?: TranslationType, options?: OptionsType): Translator;
     static getMapKey(domain: string, locale: string): string;
-    static getKey(domain: string, locale: string): string;
     static getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
     static mergeCatalogs(target?: CatalogType, ...sources: CatalogType[]): CatalogType;
     static parseMapKey(key: string): [string, string];
@@ -52,9 +54,9 @@ declare class Translator {
     };
     setFallbackDomain: (domain?: string) => Translator;
     setFallbackLocale: (locale?: string) => Translator;
-    setFormatter: (formatter?: FormatterType | undefined) => Translator;
+    setFormatter: (formatter?: FormatterType) => Translator;
     setTranslations: (catalogs: TranslationType) => Translator;
-    translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
+    translate: (key: string, replacements?: ReplacementType, domain?: string, locale?: string) => string;
     withDomain: (domain: string) => Translator;
     withFormatter: (formatter: FormatterType) => Translator;
     withLocale: (locale: string) => Translator;
@@ -72,13 +74,9 @@ declare class Translator {
 }
 declare const proxy: typeof Translator;
 export default proxy;
-export { DEFAULT_DOMAIN, DEFAULT_LOCALE };
 export { proxy as Translator };
 export declare const createTranslator: typeof Translator.create;
 export declare const formatMessage: typeof format;
 export declare const getCatalogValue: (catalog: CatalogType | undefined, key: string) => string;
 export declare const mergeCatalogs: typeof Translator.mergeCatalogs;
 export declare const translate: typeof Translator.translate;
-export declare const create: typeof Translator.create;
-export declare const merge: typeof Translator.mergeCatalogs;
-export declare const visitCatalog: (catalog: CatalogType | undefined, key: string) => string;

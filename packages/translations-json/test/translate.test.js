@@ -1,3 +1,4 @@
+import IntlMessageFormat from "intl-messageformat";
 import { translate } from "../macro";
 
 const locale = 'fr';

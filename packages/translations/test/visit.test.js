@@ -1,4 +1,4 @@
-const { getCatalogValue } = require("../index");
+const { getCatalogValue } = require("../index.min.js");
 const CATALOG = require("./constant");
 
 test('Visit catalog method', () => {

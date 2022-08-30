@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "composite": true,
-    "rootDir": "./lib",
-    "outDir": "./lib",
+    "rootDir": ".",
+    "outDir": ".",
     "sourceMap": true,
     "module": "commonjs",
-    "target": "es2021",
+    "target": "es5",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
@@ -21,7 +21,7 @@
       "dom"
     ]
   },
-  "include": ["./*.ts"],
+  "include": ["*.ts"],
   "exclude": ["node_modules"],
   "references": [
     { "path": "../translations" },

@@ -2,9 +2,8 @@
 /test
 *.js.map
 *.ts
-!*.d.ts
+!index.d.ts
 .babelrc.js
-.github
-babel-plugins-macro.config.js
+babel-plugin-macros.config.js
 tsconfig.json
 tslint.json

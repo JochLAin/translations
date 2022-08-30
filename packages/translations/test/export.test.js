@@ -1,4 +1,4 @@
-import Translator from '../index';
+import Translator from '../index.min.js';
 
 test('Default export as method', () => {
     const translator = Translator({

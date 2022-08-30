@@ -1,5 +1,5 @@
 var { createMacro } = require("babel-plugin-macros");
-var getTranslationMacro = require("./lib").default;
+var getTranslationMacro = require("./index").default;
 
 var macro = getTranslationMacro({
     extension: /\.json$/,
