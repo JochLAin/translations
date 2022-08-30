@@ -117,6 +117,7 @@ class Translator {
         if (domain.includes('_')) {
             return this._catalogs.get(Translator.getMapKey(domain, locale.split('_')[0]));
         }
+        return undefined;
     };
 
     getDomainCatalogs = (domain: string = this._fallbackDomain): { [locale: string]: CatalogType } => {
@@ -126,7 +127,7 @@ class Translator {
     };
 
     getDomains = (): string[] => {
-        return [...this._catalogs.keys()]
+        return Array.from(this._catalogs.keys())
             .map((key: string) => Translator.parseMapKey(key)[0])
             .filter((key, idx, keys) => keys.indexOf(key) === idx)
         ;
@@ -139,7 +140,7 @@ class Translator {
     };
 
     getLocales = (): string[] => {
-        return [...this._catalogs.keys()]
+        return Array.from(this._catalogs.keys())
             .map((key: string) => Translator.parseMapKey(key)[1])
             .filter((key, idx, keys) => keys.indexOf(key) === idx)
         ;
@@ -263,7 +264,7 @@ class Translator {
     }
 
     get translations(): TranslationType {
-        return [...this._catalogs.entries()].reduce((accu: TranslationType, [key, catalog]) => {
+        return Array.from(this._catalogs.entries()).reduce((accu: TranslationType, [key, catalog]) => {
             const [domain, locale] = Translator.parseMapKey(key);
             if (!accu[locale]) accu[locale] = {};
             accu[locale][domain] = catalog;

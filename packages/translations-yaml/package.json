@@ -1,0 +1,42 @@
+{
+  "name": "@jochlain/translations-yaml",
+  "version": "1.0.3",
+  "description": "Babel macro for @jochlain/translations and YAML files",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "npx jest",
+    "watch": "npx tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JochLAin/babel-macro-translations-yaml.git"
+  },
+  "keywords": [
+    "translations",
+    "translation",
+    "traductions",
+    "traduction",
+    "webpack",
+    "encore",
+    "symfony",
+    "node",
+    "yaml"
+  ],
+  "author": "Jocelyn Faihy <jochlain@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JochLAin/translations/issues"
+  },
+  "homepage": "https://github.com/JochLAin/babel-macro-translations-yaml#readme",
+  "dependencies": {
+    "@jochlain/translations-json": "^1.1.4",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.2",
+    "@babel/preset-env": "^7.16.11",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-jest": "^27.5.1",
+    "jest": "^27.5.1"
+  }
+}

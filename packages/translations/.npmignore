@@ -1,0 +1,10 @@
+# Development
+lib/*.ts
+!lib/*.d.ts
+lib/*.js
+lib/*.js.map
+test
+.babelrc.js
+tsconfig.json
+tslint.json
+webpack.config.js

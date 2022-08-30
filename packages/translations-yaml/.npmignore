@@ -1,0 +1,6 @@
+# Development
+.babelrc.js
+babel-plugin-macros.config.js
+test
+tsconfig.json
+tslint.json

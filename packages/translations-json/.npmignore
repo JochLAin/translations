@@ -1,0 +1,10 @@
+# Development
+/test
+*.js.map
+*.ts
+!*.d.ts
+.babelrc.js
+.github
+babel-plugins-macro.config.js
+tsconfig.json
+tslint.json
