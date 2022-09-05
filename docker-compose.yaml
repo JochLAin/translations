@@ -4,6 +4,7 @@ services:
     app:
         image: "node:16"
         container_name: "${APP_NAME}-app"
+        environment: ["FONTAWESOME_NPM_AUTH_TOKEN=${FONTAWESOME_NPM_AUTH_TOKEN}"]
         volumes: ["./:/home/docker"]
         working_dir: "/home/docker/packages/translations-app"
         ports: ["127.0.0.1:54500:3000"]

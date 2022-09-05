@@ -86,30 +86,30 @@ h3 {
   line-height: 1.2;
 }
 
-article {
+main > article {
   max-width: 100vw;
 }
 
 @media (--sm-above) {
-  article {
+  main > article {
     width: 540px;
   }
 }
 
 @media (--md-above) {
-  article {
+  main > article {
     width: 720px;
   }
 }
 
 @media (--lg-above) {
-  article {
+  main > article {
     width: 960px;
   }
 }
 
 @media (--xl-above) {
-  article {
+  main > article {
     width: 1320px;
   }
 }
