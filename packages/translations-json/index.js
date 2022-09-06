@@ -73,6 +73,35 @@ var IMPORT_OPTIONS = {
 };
 var formatter = { format: function (message, replacements, locale) { return String((new intl_messageformat_1.default(message, locale)).format(replacements)); } };
 var programMap = new Map();
+var cache = new (function () {
+    function Cache() {
+        this.watched = false;
+        this.buffer = new Map();
+    }
+    Cache.prototype.get = function (key) {
+        return this.buffer.get(key);
+    };
+    Cache.prototype.set = function (key, value) {
+        this.buffer.set(key, value);
+    };
+    Cache.prototype.watch = function (rootDir) {
+        var _this = this;
+        if (!this.watched) {
+            this.watched = true;
+            fs.watch(rootDir, { recursive: true }, function (evt, filename) {
+                if (evt === 'change') {
+                    var keys = Array.from(_this.buffer.keys());
+                    for (var idx = 0; idx < keys.length; idx++) {
+                        if (filename.includes(keys[idx])) {
+                            _this.buffer.delete(keys[idx]);
+                        }
+                    }
+                }
+            });
+        }
+    };
+    return Cache;
+}());
 var searchModule = function (node, moduleName, name, isDefault) {
     if (isDefault === void 0) { isDefault = false; }
     var programPath = getProgramPath(node);
@@ -202,12 +231,16 @@ var AbstractMacro = (function () {
         return nodeIdentifier;
     };
     AbstractMacro.prototype.getCatalogs = function (node, rootDir, domain, locale) {
-        var files = this.getFiles(node, rootDir, domain, locale);
-        var catalogs = {};
-        for (var idx = 0; idx < files.length; idx++) {
-            Object.assign(catalogs, (0, translations_1.mergeCatalogs)(catalogs, this.load(rootDir, files[idx])));
+        var key = "".concat(path.relative(process.cwd(), rootDir), "/").concat(domain || '', "/").concat(locale || '');
+        if (!cache.get(key)) {
+            var files = this.getFiles(node, rootDir, domain, locale);
+            var catalogs = {};
+            for (var idx = 0; idx < files.length; idx++) {
+                Object.assign(catalogs, (0, translations_1.mergeCatalogs)(catalogs, this.load(rootDir, files[idx])));
+            }
+            cache.set(key, catalogs);
         }
-        return catalogs;
+        return cache.get(key);
     };
     AbstractMacro.prototype.getFiles = function (node, rootDir, domain, locale) {
         var _this = this;
@@ -224,7 +257,13 @@ var AbstractMacro = (function () {
     AbstractMacro.prototype.load = function (rootDir, file) {
         var _a, _b;
         var _c = this.matchFile(file), domain = _c[0], locale = _c[1];
-        return _a = {}, _a[locale] = (_b = {}, _b[domain] = this.loader.load(fs.readFileSync(path.join(rootDir, file)).toString()), _b), _a;
+        var key = path.relative(process.cwd(), path.join(rootDir, file));
+        if (!cache.get(key)) {
+            var filename = path.join(rootDir, file);
+            var content = fs.readFileSync(filename).toString();
+            cache.set(key, this.loader.load(content));
+        }
+        return _a = {}, _a[locale] = (_b = {}, _b[domain] = cache.get(key), _b), _a;
     };
     AbstractMacro.prototype.matchFile = function (file) {
         var _a = file.split('.').reverse(), extension = _a[0], locale = _a[1], parts = _a.slice(2);
@@ -453,6 +492,10 @@ exports.default = (function (loader) { return function (_a) {
     var options = getOptions(config);
     var factoryTranslator = createTranslatorMacro(types, loader, options);
     var factoryTranslate = createTranslateMacro(types, loader, options);
+    console.log(options.watch ? 'WATCH !!!!! \n\n\n' : 'NO WATCH !!!!! \n\n\n');
+    if (options.watch) {
+        cache.watch(options.rootDir);
+    }
     Object.keys(references).forEach(function (method) {
         references[method].forEach(function (node) {
             if (!node.parentPath)

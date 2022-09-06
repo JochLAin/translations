@@ -9,7 +9,7 @@ import IntlMessageFormat from "intl-messageformat";
 import * as path from "path";
 
 type LoaderType = { extension: RegExp, load: (content: string) => CatalogType };
-type OptionsType = { rootDir: string };
+type OptionsType = { rootDir: string, watch?: boolean };
 type InputType = { [key: string]: any }|undefined;
 
 const AVAILABLE_METHODS = ['createTranslator', 'translate'];
@@ -30,6 +30,39 @@ const IMPORT_OPTIONS = {
 
 const formatter = { format: (message: string, replacements: ReplacementType, locale: string): string => String((new IntlMessageFormat(message, locale)).format(replacements)) };
 const programMap = new Map<Babel.NodePath<BabelTypes.Node>, Babel.NodePath<BabelTypes.Program>>();
+
+const cache = new class Cache {
+  buffer: Map<string, any>;
+  watched: boolean = false;
+
+  constructor() {
+    this.buffer = new Map<string, any>();
+  }
+
+  get(key: string): any {
+    return this.buffer.get(key);
+  }
+
+  set(key: string, value: any) {
+    this.buffer.set(key, value);
+  }
+
+  watch(rootDir: string) {
+    if (!this.watched) {
+      this.watched = true;
+      fs.watch(rootDir, { recursive: true }, (evt, filename) => {
+        if (evt === 'change') {
+          const keys = Array.from(this.buffer.keys());
+          for (let idx = 0; idx < keys.length; idx++) {
+            if (filename.includes(keys[idx])) {
+              this.buffer.delete(keys[idx]);
+            }
+          }
+        }
+      });
+    }
+  }
+}
 
 const searchModule = (node: Babel.NodePath<BabelTypes.Node>, moduleName: string, name: string, isDefault: boolean = false): BabelTypes.Identifier|null => {
   const programPath = getProgramPath(node);
@@ -187,23 +220,16 @@ class AbstractMacro {
   }
 
   getCatalogs(node: Babel.NodePath<BabelTypes.CallExpression>, rootDir: string, domain?: string, locale?: string): TranslationType {
-    // const key = `${path.relative(process.cwd(), rootDir)}/${domain || ''}/${locale || ''}`;
-    // if (!cache.get(key)) {
-    //     const files = this.getFiles(node, rootDir, domain, locale);
-    //     const catalogs = {};
-    //     for (let idx = 0; idx < files.length; idx++) {
-    //         Object.assign(catalogs, mergeCatalogs(catalogs, this.load(rootDir, files[idx])));
-    //     }
-    //     cache.set(key, catalogs);
-    // }
-    // return cache.get(key);
-
-    const files = this.getFiles(node, rootDir, domain, locale);
-    const catalogs = {};
-    for (let idx = 0; idx < files.length; idx++) {
-      Object.assign(catalogs, mergeCatalogs(catalogs, this.load(rootDir, files[idx])));
+    const key = `${path.relative(process.cwd(), rootDir)}/${domain || ''}/${locale || ''}`;
+    if (!cache.get(key)) {
+        const files = this.getFiles(node, rootDir, domain, locale);
+        const catalogs = {};
+        for (let idx = 0; idx < files.length; idx++) {
+            Object.assign(catalogs, mergeCatalogs(catalogs, this.load(rootDir, files[idx])));
+        }
+        cache.set(key, catalogs);
     }
-    return catalogs;
+    return cache.get(key);
   }
 
   getFiles(node: Babel.NodePath<BabelTypes.CallExpression>, rootDir: string, domain?: string, locale?: string): string[] {
@@ -223,14 +249,14 @@ class AbstractMacro {
 
   load(rootDir: string, file: string): TranslationType {
     const [domain, locale] = this.matchFile(file);
-    // const key = path.relative(process.cwd(), path.join(rootDir, file));
-    // if (!cache.get(key)) {
-    //     const filename = path.join(rootDir, file);
-    //     const content = fs.readFileSync(filename).toString();
-    //     cache.set(key, this.loader.load(content));
-    // }
-    // return { [locale]: { [domain]: cache.get(key) } };
-    return { [locale]: { [domain]: this.loader.load(fs.readFileSync(path.join(rootDir, file)).toString()) } };
+    const key = path.relative(process.cwd(), path.join(rootDir, file));
+    if (!cache.get(key)) {
+        const filename = path.join(rootDir, file);
+        const content = fs.readFileSync(filename).toString();
+        cache.set(key, this.loader.load(content));
+    }
+    return { [locale]: { [domain]: cache.get(key) } };
+    // return { [locale]: { [domain]: this.loader.load(fs.readFileSync(path.join(rootDir, file)).toString()) } };
   }
 
   matchFile(file: string): string[] {
@@ -504,7 +530,7 @@ const createTranslateMacro = (types: typeof BabelTypes, loader: LoaderType, opti
   return new TranslateMacro(types, loader, options);
 };
 
-const getOptions = (config: InputType) => {
+const getOptions = (config: InputType): OptionsType => {
   const options = Object.assign({ rootDir: DEFAULT_ROOT_DIR }, config);
   return Object.assign(options, {
     rootDir: path.resolve(process.cwd(), options.rootDir),
@@ -516,6 +542,10 @@ export default (loader: LoaderType) =>  ({ babel, config, references }: typeof M
   const options = getOptions(config);
   const factoryTranslator = createTranslatorMacro(types, loader, options);
   const factoryTranslate = createTranslateMacro(types, loader, options);
+
+  if (options.watch) {
+    cache.watch(options.rootDir);
+  }
 
   Object.keys(references).forEach((method) => {
     references[method].forEach((node: Babel.NodePath<BabelTypes.Node>) => {
