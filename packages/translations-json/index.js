@@ -492,7 +492,6 @@ exports.default = (function (loader) { return function (_a) {
     var options = getOptions(config);
     var factoryTranslator = createTranslatorMacro(types, loader, options);
     var factoryTranslate = createTranslateMacro(types, loader, options);
-    console.log(options.watch ? 'WATCH !!!!! \n\n\n' : 'NO WATCH !!!!! \n\n\n');
     if (options.watch) {
         cache.watch(options.rootDir);
     }

@@ -35,8 +35,8 @@ exports.format = format;
 var KEY_SEPARATOR = '-';
 var Translator = (function () {
     function Translator(catalogs, options) {
-        if (options === void 0) { options = {}; }
         var _this = this;
+        if (options === void 0) { options = {}; }
         this._fallbackDomain = exports.DEFAULT_DOMAIN;
         this._fallbackLocale = exports.DEFAULT_LOCALE;
         this._formatter = { format: format };

@@ -54,9 +54,9 @@ declare class Translator {
     };
     setFallbackDomain: (domain?: string) => Translator;
     setFallbackLocale: (locale?: string) => Translator;
-    setFormatter: (formatter?: FormatterType) => Translator;
+    setFormatter: (formatter?: FormatterType | undefined) => Translator;
     setTranslations: (catalogs: TranslationType) => Translator;
-    translate: (key: string, replacements?: ReplacementType, domain?: string, locale?: string) => string;
+    translate: (key: string, replacements?: ReplacementType | undefined, domain?: string | undefined, locale?: string | undefined) => string;
     withDomain: (domain: string) => Translator;
     withFormatter: (formatter: FormatterType) => Translator;
     withLocale: (locale: string) => Translator;
