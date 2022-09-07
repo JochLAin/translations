@@ -1,6 +1,6 @@
 {
   "name": "@jochlain/translations-json",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Babel macro for @jochlain/translations and JSON files",
   "main": "index.min.js",
   "types": "index.d.ts",
