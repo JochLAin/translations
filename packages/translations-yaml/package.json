@@ -1,6 +1,6 @@
 {
   "name": "@jochlain/translations-yaml",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Babel macro for @jochlain/translations and YAML files",
   "scripts": {
     "build": "npx tsc",

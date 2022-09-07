@@ -1,6 +1,6 @@
 {
   "name": "@jochlain/translations",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Translation module",
   "main": "index.min.js",
   "module": "index.js",
