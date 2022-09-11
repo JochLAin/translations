@@ -8,12 +8,13 @@
     "test": "test"
   },
   "scripts": {
+    "debug": "NODE_ENV=test npx babel test/debug.js",
     "build": "npx tsc",
     "watch": "npx tsc -w",
     "minimize": "terser --compress --mangle -o index.min.js -- index.js",
     "types": "tsc --emitDeclarationOnly",
     "prepublishOnly": "npm run build && npm run minimize",
-    "test": "npx jest"
+    "test": "npx jest --clearCache && npx jest"
   },
   "repository": {
     "type": "git",

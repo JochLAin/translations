@@ -339,22 +339,22 @@ var TranslateMacro = (function (_super) {
     TranslateMacro.prototype.buildNode = function (node) {
         if (!node)
             return;
-        if (this.isLocaleLiteral(node)) {
-            return this.buildNodeWithLiteralLocale(node);
+        if (!this.hasReplacementIdentifier(node) && this.isLocaleLiteral(node)) {
+            return this.buildNodeWithLiteral(node);
         }
-        return this.buildNodeWithIdentifierLocale(node);
+        return this.buildNodeWithIdentifier(node);
     };
-    TranslateMacro.prototype.buildNodeWithIdentifierLocale = function (node) {
+    TranslateMacro.prototype.buildNodeWithIdentifier = function (node) {
         var _a = this.getArguments(node), catalog = _a.catalog, replacements = _a.replacements, locale = _a.locale;
         var translateMethodIdentifier = getModule(node, '@jochlain/translations', 'translate');
         return this.types.callExpression(translateMethodIdentifier, [
             this.types.valueToNode(catalog),
             this.types.valueToNode(replacements),
-            this.types.identifier(locale),
+            this.isLocaleLiteral(node) ? this.types.stringLiteral(locale) : this.types.identifier(locale),
             this.createIntlFormatter(node),
         ]);
     };
-    TranslateMacro.prototype.buildNodeWithLiteralLocale = function (node) {
+    TranslateMacro.prototype.buildNodeWithLiteral = function (node) {
         var _a = this.getArguments(node), catalog = _a.catalog, replacements = _a.replacements, locale = _a.locale;
         var value = (0, translations_1.translate)(catalog, replacements, locale, formatter);
         return this.types.stringLiteral(value);
@@ -394,7 +394,7 @@ var TranslateMacro = (function (_super) {
             throw node.parentPath.buildCodeFrameError("Replacement argument is not an object", babel_plugin_macros_1.MacroError);
         }
         return node.node.arguments[1].properties.reduce(function (accu, property) {
-            var _a, _b;
+            var _a, _b, _c;
             if (!_this.types.isObjectProperty(property))
                 return accu;
             property = property;
@@ -403,14 +403,21 @@ var TranslateMacro = (function (_super) {
             if (!_this.types.isIdentifier(property.key) && !_this.types.isStringLiteral(property.key)) {
                 throw node.parentPath.buildCodeFrameError("Replacements option parameter has an invalid key", babel_plugin_macros_1.MacroError);
             }
-            var key = _this.types.isIdentifier(property.key) ? property.key.name : property.key.value;
-            if (_this.types.isStringLiteral(property.value)) {
-                return __assign(__assign({}, accu), (_a = {}, _a[key] = property.value.value, _a));
+            var _key = property.key, _value = property.value;
+            var key = _key.value;
+            if (_this.types.isIdentifier(_key)) {
+                key = _key.name;
             }
-            else if (_this.types.isNumericLiteral(property.value)) {
-                return __assign(__assign({}, accu), (_b = {}, _b[key] = property.value.value, _b));
+            if (_this.types.isStringLiteral(_value)) {
+                return __assign(__assign({}, accu), (_a = {}, _a[key] = _value.value, _a));
             }
-            throw node.parentPath.buildCodeFrameError("Replacements option parameter must be an object of string or number", babel_plugin_macros_1.MacroError);
+            else if (_this.types.isNumericLiteral(_value)) {
+                return __assign(__assign({}, accu), (_b = {}, _b[key] = _value.value, _b));
+            }
+            else if (_this.types.isIdentifier(_value)) {
+                return __assign(__assign({}, accu), (_c = {}, _c[key] = _value.name, _c));
+            }
+            throw node.parentPath.buildCodeFrameError("Replacements option parameter must be an object of string, number or variables", babel_plugin_macros_1.MacroError);
         }, {});
     };
     TranslateMacro.prototype.getOptions = function (node) {
@@ -454,6 +461,28 @@ var TranslateMacro = (function (_super) {
             return (__assign(__assign({}, accu), (_c = {}, _c[key] = property.value.value, _c)));
         }, {});
         return Object.assign({ domain: 'messages', host: undefined, locale: 'en' }, options);
+    };
+    TranslateMacro.prototype.hasReplacementIdentifier = function (node) {
+        if (node.node.arguments.length <= 1)
+            return false;
+        if (this.types.isNullLiteral(node.node.arguments[1]))
+            return false;
+        if (!this.types.isObjectExpression(node.node.arguments[1])) {
+            return false;
+        }
+        var properties = node.node.arguments[1].properties;
+        for (var idx = 0; idx < properties.length; idx++) {
+            if (!this.types.isObjectProperty(properties[idx]))
+                continue;
+            var property = properties[idx];
+            if (!this.types.isIdentifier(property.key) && !this.types.isStringLiteral(property.key)) {
+                return false;
+            }
+            if (this.types.isIdentifier(property.value)) {
+                return true;
+            }
+        }
+        return false;
     };
     TranslateMacro.prototype.isLocaleLiteral = function (node) {
         if (!node.node.arguments[2])

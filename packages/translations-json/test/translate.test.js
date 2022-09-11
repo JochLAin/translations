@@ -53,3 +53,8 @@ test('Translate macro with host parameter', () => {
     expect(translate('some back message', null, { host: 'back', locale: 'fr' })).toBe("c'est privé");
     expect(translate('some back message', null, { host: 'back', locale })).toBe("c'est privé");
 });
+
+test('Translate macro with variable parameter', () => {
+    const count = 1;
+    expect(translate('diff.ago.year', { count: count }, { domain: 'times' })).toBe('1 year ago');
+});

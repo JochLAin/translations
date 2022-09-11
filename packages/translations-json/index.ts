@@ -344,25 +344,26 @@ class CreateTranslatorMacro extends AbstractMacro {
 class TranslateMacro extends AbstractMacro {
   buildNode(node: Babel.NodePath<BabelTypes.CallExpression>|null) {
     if (!node) return;
-    if (this.isLocaleLiteral(node)) {
-      return this.buildNodeWithLiteralLocale(node);
+
+    if (!this.hasReplacementIdentifier(node) && this.isLocaleLiteral(node)) {
+      return this.buildNodeWithLiteral(node);
     }
-    return this.buildNodeWithIdentifierLocale(node);
+    return this.buildNodeWithIdentifier(node);
   }
 
-  buildNodeWithIdentifierLocale(node: Babel.NodePath<BabelTypes.CallExpression>) {
+  buildNodeWithIdentifier(node: Babel.NodePath<BabelTypes.CallExpression>) {
     const { catalog, replacements, locale } = this.getArguments(node);
     const translateMethodIdentifier = getModule(node, '@jochlain/translations', 'translate');
 
     return this.types.callExpression(translateMethodIdentifier, [
       this.types.valueToNode(catalog),
       this.types.valueToNode(replacements),
-      this.types.identifier(locale),
+      this.isLocaleLiteral(node) ? this.types.stringLiteral(locale) : this.types.identifier(locale),
       this.createIntlFormatter(node),
     ]);
   }
 
-  buildNodeWithLiteralLocale(node: Babel.NodePath<BabelTypes.CallExpression>) {
+  buildNodeWithLiteral(node: Babel.NodePath<BabelTypes.CallExpression>) {
     const { catalog, replacements, locale } = this.getArguments(node);
     const value = translate(catalog, replacements, locale, formatter);
 
@@ -417,15 +418,21 @@ class TranslateMacro extends AbstractMacro {
         );
       }
 
-      const key = this.types.isIdentifier(property.key) ? (property.key as BabelTypes.Identifier).name : (property.key as BabelTypes.StringLiteral).value;
-      if (this.types.isStringLiteral(property.value)) {
-        return { ...accu, [key]: (property.value as BabelTypes.StringLiteral).value };
-      } else if (this.types.isNumericLiteral(property.value)) {
-        return { ...accu, [key]: (property.value as BabelTypes.NumericLiteral).value };
+      const { key: _key, value: _value } = property;
+      let key = _key.value;
+      if (this.types.isIdentifier(_key)) {
+        key = _key.name;
+      }
+      if (this.types.isStringLiteral(_value)) {
+        return { ...accu, [key]: _value.value };
+      } else if (this.types.isNumericLiteral(_value)) {
+        return { ...accu, [key]: _value.value };
+      } else if (this.types.isIdentifier(_value)) {
+        return { ...accu, [key]: _value.name };
       }
 
       throw node.parentPath.buildCodeFrameError(
-        `Replacements option parameter must be an object of string or number`,
+        `Replacements option parameter must be an object of string, number or variables`,
         MacroError
       );
     }, {});
@@ -505,6 +512,28 @@ class TranslateMacro extends AbstractMacro {
     }, {});
 
     return Object.assign({ domain: 'messages', host: undefined, locale: 'en' }, options);
+  }
+
+  hasReplacementIdentifier(node: Babel.NodePath<BabelTypes.CallExpression>) {
+    if (node.node.arguments.length <= 1) return false;
+    if (this.types.isNullLiteral(node.node.arguments[1])) return false;
+
+    if (!this.types.isObjectExpression(node.node.arguments[1])) {
+      return false;
+    }
+
+    const { properties } = node.node.arguments[1] as BabelTypes.ObjectExpression;
+    for (let idx = 0; idx < properties.length; idx++) {
+      if (!this.types.isObjectProperty(properties[idx])) continue;
+      const property = properties[idx] as BabelTypes.ObjectProperty;
+      if (!this.types.isIdentifier(property.key) && !this.types.isStringLiteral(property.key)) {
+        return false;
+      }
+      if (this.types.isIdentifier(property.value)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   isLocaleLiteral(node: Babel.NodePath<BabelTypes.CallExpression>) {
