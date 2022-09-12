@@ -352,19 +352,20 @@ class TranslateMacro extends AbstractMacro {
   }
 
   buildNodeWithIdentifier(node: Babel.NodePath<BabelTypes.CallExpression>) {
-    const { catalog, replacements, locale } = this.getArguments(node);
+    const { catalog, locale } = this.getArguments(node);
     const translateMethodIdentifier = getModule(node, '@jochlain/translations', 'translate');
 
     return this.types.callExpression(translateMethodIdentifier, [
       this.types.valueToNode(catalog),
-      this.types.valueToNode(replacements),
+      this.getNodeReplacement(node),
       this.isLocaleLiteral(node) ? this.types.stringLiteral(locale) : this.types.identifier(locale),
       this.createIntlFormatter(node),
     ]);
   }
 
   buildNodeWithLiteral(node: Babel.NodePath<BabelTypes.CallExpression>) {
-    const { catalog, replacements, locale } = this.getArguments(node);
+    const { catalog, locale } = this.getArguments(node);
+    const replacements = this.getArgumentReplacements(node);
     const value = translate(catalog, replacements, locale, formatter);
 
     return this.types.stringLiteral(value);
@@ -372,7 +373,6 @@ class TranslateMacro extends AbstractMacro {
 
   getArguments(node: Babel.NodePath<BabelTypes.CallExpression>) {
     const message = this.getArgumentMessage(node);
-    const replacements = this.getArgumentReplacements(node);
     const { domain, host, locale } = this.getOptions(node);
     const rootDir = host ? path.resolve(this.options.rootDir, host) : this.options.rootDir;
 
@@ -383,12 +383,12 @@ class TranslateMacro extends AbstractMacro {
         value = getCatalogValue(catalogs[locale][domain], message);
       }
       const catalog = { [locale]: value };
-      return { catalog, replacements, locale };
+      return { catalog, locale };
     }
 
     const catalogs = this.getCatalogs(node, rootDir, domain);
     const catalog = Object.keys(catalogs).reduce((accu, locale) => ({ ...accu, [locale]: getCatalogValue(catalogs[locale][domain], message) }), {});
-    return { catalog, replacements, locale };
+    return { catalog, locale };
   }
 
   getArgumentMessage(node: Babel.NodePath<BabelTypes.CallExpression>): string {
@@ -512,6 +512,20 @@ class TranslateMacro extends AbstractMacro {
     }, {});
 
     return Object.assign({ domain: 'messages', host: undefined, locale: 'en' }, options);
+  }
+
+  getNodeReplacement(node: Babel.NodePath<BabelTypes.CallExpression>): BabelTypes.ObjectExpression {
+    if (node.node.arguments.length <= 1) return this.types.objectExpression([]);
+    if (this.types.isNullLiteral(node.node.arguments[1])) return this.types.objectExpression([]);
+
+    if (!this.types.isObjectExpression(node.node.arguments[1])) {
+      throw node.parentPath.buildCodeFrameError(
+        `Replacement argument is not an object`,
+        MacroError
+      );
+    }
+
+    return node.node.arguments[1];
   }
 
   hasReplacementIdentifier(node: Babel.NodePath<BabelTypes.CallExpression>) {

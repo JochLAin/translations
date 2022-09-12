@@ -345,24 +345,24 @@ var TranslateMacro = (function (_super) {
         return this.buildNodeWithIdentifier(node);
     };
     TranslateMacro.prototype.buildNodeWithIdentifier = function (node) {
-        var _a = this.getArguments(node), catalog = _a.catalog, replacements = _a.replacements, locale = _a.locale;
+        var _a = this.getArguments(node), catalog = _a.catalog, locale = _a.locale;
         var translateMethodIdentifier = getModule(node, '@jochlain/translations', 'translate');
         return this.types.callExpression(translateMethodIdentifier, [
             this.types.valueToNode(catalog),
-            this.types.valueToNode(replacements),
+            this.getNodeReplacement(node),
             this.isLocaleLiteral(node) ? this.types.stringLiteral(locale) : this.types.identifier(locale),
             this.createIntlFormatter(node),
         ]);
     };
     TranslateMacro.prototype.buildNodeWithLiteral = function (node) {
-        var _a = this.getArguments(node), catalog = _a.catalog, replacements = _a.replacements, locale = _a.locale;
+        var _a = this.getArguments(node), catalog = _a.catalog, locale = _a.locale;
+        var replacements = this.getArgumentReplacements(node);
         var value = (0, translations_1.translate)(catalog, replacements, locale, formatter);
         return this.types.stringLiteral(value);
     };
     TranslateMacro.prototype.getArguments = function (node) {
         var _a;
         var message = this.getArgumentMessage(node);
-        var replacements = this.getArgumentReplacements(node);
         var _b = this.getOptions(node), domain = _b.domain, host = _b.host, locale = _b.locale;
         var rootDir = host ? path.resolve(this.options.rootDir, host) : this.options.rootDir;
         if (this.isLocaleLiteral(node)) {
@@ -372,14 +372,14 @@ var TranslateMacro = (function (_super) {
                 value = (0, translations_1.getCatalogValue)(catalogs_1[locale][domain], message);
             }
             var catalog_1 = (_a = {}, _a[locale] = value, _a);
-            return { catalog: catalog_1, replacements: replacements, locale: locale };
+            return { catalog: catalog_1, locale: locale };
         }
         var catalogs = this.getCatalogs(node, rootDir, domain);
         var catalog = Object.keys(catalogs).reduce(function (accu, locale) {
             var _a;
             return (__assign(__assign({}, accu), (_a = {}, _a[locale] = (0, translations_1.getCatalogValue)(catalogs[locale][domain], message), _a)));
         }, {});
-        return { catalog: catalog, replacements: replacements, locale: locale };
+        return { catalog: catalog, locale: locale };
     };
     TranslateMacro.prototype.getArgumentMessage = function (node) {
         return node.node.arguments[0].value;
@@ -461,6 +461,16 @@ var TranslateMacro = (function (_super) {
             return (__assign(__assign({}, accu), (_c = {}, _c[key] = property.value.value, _c)));
         }, {});
         return Object.assign({ domain: 'messages', host: undefined, locale: 'en' }, options);
+    };
+    TranslateMacro.prototype.getNodeReplacement = function (node) {
+        if (node.node.arguments.length <= 1)
+            return this.types.objectExpression([]);
+        if (this.types.isNullLiteral(node.node.arguments[1]))
+            return this.types.objectExpression([]);
+        if (!this.types.isObjectExpression(node.node.arguments[1])) {
+            throw node.parentPath.buildCodeFrameError("Replacement argument is not an object", babel_plugin_macros_1.MacroError);
+        }
+        return node.node.arguments[1];
     };
     TranslateMacro.prototype.hasReplacementIdentifier = function (node) {
         if (node.node.arguments.length <= 1)
