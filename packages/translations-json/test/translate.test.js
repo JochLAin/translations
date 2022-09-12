@@ -56,5 +56,5 @@ test('Translate macro with host parameter', () => {
 
 test('Translate macro with variable parameter', () => {
     const count = 1;
-    expect(translate('diff.ago.year', { count: count }, { domain: 'times' })).toBe('1 year ago');
+    expect(translate('diff.ago.year', { count }, { domain: 'times' })).toBe('1 year ago');
 });
